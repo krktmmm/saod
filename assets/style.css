@@ -1,28 +1,28 @@
 /* Общие стили сайта «Деревья поиска по шагам» */
 :root{
-  --bg:#f6f7f9;--card:#fff;--tx:#1d2330;--mut:#5d6677;--bd:#d9dde5;
-  --ac:#3b6fe0;--acsoft:#e7eeff;--ok:#2e9e5b;--oksoft:#e3f6ea;
-  --bad:#d64545;--badsoft:#fdeaea;--node:#e9eefb;--node2:#d7e2fb;
-  --warn:#a96a08;--warnsoft:#fdf1dc;--vio:#6f51c9;--viosoft:#eee9ff;
-  --shadow:0 10px 30px rgba(24,39,75,.09);
+  --bg:#faf9f5;--card:#fffefb;--tx:#2a2925;--mut:#6b665b;--bd:#e2ddd0;
+  --ac:#3f5f7d;--acsoft:#e3eaf0;--ok:#3f7a4e;--oksoft:#e2eee3;
+  --bad:#b2453b;--badsoft:#f6e1dd;--node:#efeadd;--node2:#e4ddca;
+  --warn:#9a6a14;--warnsoft:#f6ecd2;--vio:#7a5470;--viosoft:#f0e4ec;
+  --onac:#fff;--shadow:0 10px 30px rgba(60,45,20,.08);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#14171d;--card:#1d222b;--tx:#e8ebf2;--mut:#98a1b3;--bd:#333b4a;
-    --ac:#6d98ff;--acsoft:#26324a;--ok:#4cc27f;--oksoft:#1f3a2b;
-    --bad:#ff6b6b;--badsoft:#3d2328;--node:#27324a;--node2:#31405f;
-    --warn:#e5b054;--warnsoft:#3d3320;--vio:#a98cff;--viosoft:#312a4a;
-    --shadow:0 10px 30px rgba(0,0,0,.3);
+    --bg:#1f1e1b;--card:#2a2926;--tx:#ece8de;--mut:#a09b8e;--bd:#3e3b35;
+    --ac:#8fb0cc;--acsoft:#27323c;--ok:#4b8f5d;--oksoft:#233229;
+    --bad:#c4574b;--badsoft:#3b2724;--node:#34312c;--node2:#413d36;
+    --warn:#dfb260;--warnsoft:#3a3220;--vio:#c093b3;--viosoft:#3a2a35;
+    --onac:#1f1e1b;--shadow:0 10px 30px rgba(0,0,0,.35);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#14171d;--card:#1d222b;--tx:#e8ebf2;--mut:#98a1b3;--bd:#333b4a;
-  --ac:#6d98ff;--acsoft:#26324a;--ok:#4cc27f;--oksoft:#1f3a2b;
-  --bad:#ff6b6b;--badsoft:#3d2328;--node:#27324a;--node2:#31405f;
-  --warn:#e5b054;--warnsoft:#3d3320;--vio:#a98cff;--viosoft:#312a4a;
-  --shadow:0 10px 30px rgba(0,0,0,.3);
+  --bg:#1f1e1b;--card:#2a2926;--tx:#ece8de;--mut:#a09b8e;--bd:#3e3b35;
+  --ac:#8fb0cc;--acsoft:#27323c;--ok:#4b8f5d;--oksoft:#233229;
+  --bad:#c4574b;--badsoft:#3b2724;--node:#34312c;--node2:#413d36;
+  --warn:#dfb260;--warnsoft:#3a3220;--vio:#c093b3;--viosoft:#3a2a35;
+  --onac:#1f1e1b;--shadow:0 10px 30px rgba(0,0,0,.35);
   color-scheme:dark;
 }
 :root[data-theme="amoled"]{
@@ -32,6 +32,7 @@
   --warn:#e5b054;--warnsoft:rgba(229,176,84,.12);--vio:#a98cff;--viosoft:rgba(169,140,255,.12);
   --shadow:0 10px 30px rgba(0,0,0,.7);
   --glass:blur(8px) saturate(160%);
+  --onac:#fff;
   color-scheme:dark;
 }
 :root[data-theme="amoled"] input:focus{border-color:white}
@@ -169,8 +170,8 @@ input:focus,select:focus{outline:2px solid var(--acsoft);border-color:var(--ac)}
 input[type=number]{max-width:130px}
 button{font:inherit;font-size:15px;padding:9px 14px;border:1px solid var(--bd);border-radius:9px;background:var(--card);color:var(--tx);cursor:pointer;transition:border-color .12s,color .12s,filter .12s;-webkit-user-select:none;user-select:none}
 button:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
-button.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
-button.p:hover:not(:disabled){color:#fff;filter:brightness(1.07)}
+button.p{background:var(--ac);border-color:var(--ac);color:var(--onac);font-weight:600}
+button.p:hover:not(:disabled){color:var(--onac);filter:brightness(1.07)}
 button:disabled{opacity:.38;cursor:default}
 .meta{color:var(--mut);font-size:13.5px}
 .meta b{color:var(--tx)}
@@ -197,7 +198,7 @@ button:disabled{opacity:.38;cursor:default}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .how div{border:1px solid var(--bd);border-radius:12px;padding:12px;font-size:14px;color:var(--mut);background:var(--bg)}
 .how b{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:14.5px;margin-bottom:4px}
-.how i{width:24px;height:24px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;flex:0 0 auto}
+.how i{width:24px;height:24px;border-radius:50%;background:var(--ac);color:var(--onac);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;flex:0 0 auto}
 .stage .controls{gap:8px;align-items:center}
 .stage .counter{margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
 .scrub{
@@ -225,7 +226,7 @@ button:disabled{opacity:.38;cursor:default}
   border-radius:50%;
   background:var(--ac);
   border:2px solid var(--card);
-  box-shadow:0 1px 4px rgba(24,39,75,.35);
+  box-shadow:0 1px 4px rgba(40,30,15,.3);
   cursor:pointer;
 }
 .scrub::-moz-range-track{height:6px;border-radius:999px;background:var(--bd)}
@@ -236,14 +237,14 @@ button:disabled{opacity:.38;cursor:default}
   border-radius:50%;
   background:var(--ac);
   border:2px solid var(--card);
-  box-shadow:0 1px 4px rgba(24,39,75,.35);
+  box-shadow:0 1px 4px rgba(40,30,15,.3);
 }
 .scrub:focus-visible{outline:2px solid var(--acsoft);border-radius:999px}
 /* Выпадающие списки в тёмных темах: тёмный фон и светлый текст пунктов */
 :root[data-theme="dark"] option,
-:root[data-theme="amoled"] option{background:#1d222b;color:#e8ebf2}
+:root[data-theme="amoled"] option{background:#2a2926;color:#ece8de}
 :root[data-theme="dark"] option:checked,
-:root[data-theme="amoled"] option:checked{background:#31405f;color:#fff}
+:root[data-theme="amoled"] option:checked{background:#413d36;color:#fff}
 :root[data-theme="amoled"] .scrub::-webkit-slider-thumb{
   background:#fff;
   border-color:#000;
@@ -267,8 +268,8 @@ button:disabled{opacity:.38;cursor:default}
 .chip i{font-style:normal;font-size:10px;color:var(--mut);margin-top:1px}
 .chip.off{opacity:.3}
 .chip.seg{border-color:var(--ac)}
-.chip.mid{background:var(--ac);border-color:var(--ac);color:#fff}
-.chip.mid i{color:rgba(255,255,255,.8)}
+.chip.mid{background:var(--ac);border-color:var(--ac);color:var(--onac)}
+.chip.mid i{color:var(--onac);opacity:.85}
 .chip.done{background:var(--node);border-color:var(--bd)}
 .legend{display:flex;gap:8px 16px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)}
 .legend span{font-size:13px;color:var(--mut);display:inline-flex;align-items:center;gap:5px}
@@ -305,8 +306,8 @@ table.dp td.cur{background:var(--acsoft);outline:2px solid var(--ac);outline-off
 table.cmp td:first-child,table.cmp th:first-child{text-align:left}
 table.cmp tr.best td{background:var(--oksoft)}
 .tabs{gap:8px;margin-bottom:12px}
-.tab.on{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
-.tab.on:hover{color:#fff}
+.tab.on{background:var(--ac);border-color:var(--ac);color:var(--onac);font-weight:600}
+.tab.on:hover{color:var(--onac)}
 .pager{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:14px}
 .pager a{text-decoration:none}
 .pager a:hover{text-decoration:underline}
@@ -323,7 +324,7 @@ footer.note{color:var(--mut);font-size:12.5px;text-align:center;margin-top:26px}
 .tile.code .ic{background:var(--viosoft);color:var(--vio)}
 
 /* ---------- Штрихи дубликатов (A′, A″) ---------- */
-.pr{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-style:normal;font-weight:600;letter-spacing:0;font-size:.8em;margin-left:-.06em}
+.pr{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-style:normal;font-weight:700;letter-spacing:0;font-size:1em;line-height:0;margin-left:-.04em;position:relative;top:-.06em}
 .code-src .pr{margin-left:-.32em}
 
 /* ---------- Сортировки ---------- */
@@ -389,8 +390,8 @@ footer.note{color:var(--mut);font-size:12.5px;text-align:center;margin-top:26px}
 .idx-cell i{font-style:normal;font-size:10px;color:var(--mut)}
 .idx-cell.on{border-color:var(--ac);background:var(--acsoft)}
 .idx-cell.off{opacity:.25}
-.idx-cell.hot{background:var(--ac);border-color:var(--ac);color:#fff}
-.idx-cell.hot i{color:rgba(255,255,255,.8)}
+.idx-cell.hot{background:var(--ac);border-color:var(--ac);color:var(--onac)}
+.idx-cell.hot i{color:var(--onac);opacity:.85}
 .idx-cell.pick{border-color:var(--ok);background:var(--oksoft)}
 .pairs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
 .pair{border:1px solid var(--bd);border-radius:9px;padding:5px 9px;background:var(--card);font-size:14px;text-align:center;min-width:52px}
