@@ -14,7 +14,7 @@
 </header>
 <main>
   <h1>Хеширование по шагам</h1>
-  <p class="lead">Строим хеш-таблицу из символов. Хеш-функция — код символа по модулю размера таблицы. Коллизии разрешаются двумя способами: цепочками (прямое связывание) или поиском свободной ячейки (открытая адресация).</p>
+  <p class="lead">Строим хеш-таблицу из символов. Хеш-функция — номер буквы в алфавите по модулю размера таблицы (если символы из разных алфавитов — код символа). Коллизии разрешаются двумя способами: цепочками (прямое связывание) или поиском свободной ячейки (открытая адресация).</p>
 
   <section class="card">
     <div class="row">
@@ -26,9 +26,16 @@
         <label for="size">Размер таблицы m</label>
         <input id="size" type="number" min="3" max="15" step="1" value="11">
       </div>
+      <div class="field" id="probeField" style="flex:0 1 230px;display:none">
+        <label for="probe">Пробы (открытая адресация)</label>
+        <select id="probe">
+          <option value="lin">Линейные: h + i</option>
+          <option value="quad">Квадратичные: h + i²</option>
+        </select>
+      </div>
       <button class="p" id="go" type="button">Построить</button>
     </div>
-    <div class="meta" style="margin-top:9px">До 20 ключей. Повторяющиеся символы добавляются как отдельные записи — так видны коллизии.</div>
+    <div class="meta" style="margin-top:9px">До 20 ключей. Буквы приводятся к заглавным, повторяющиеся получают штрихи (A, A′) и добавляются как отдельные записи — так видны коллизии. Хеш — номер буквы в алфавите.</div>
   </section>
 
   <div class="row tabs wrap" id="methodTabs" role="tablist" aria-label="Метод разрешения коллизий">
@@ -49,6 +56,7 @@
     <summary>Метод открытой адресации</summary>
     <p>Все ключи хранятся в самой таблице. Если ячейка <code>h</code> занята, проверяем следующую по кругу: <code>(h + 1) mod m</code>, затем <code>(h + 2) mod m</code> и так далее. Это линейное опробование.</p>
     <p>Коэффициент заполнения не может превышать 1. Чем ближе <code>α</code> к 1, тем длиннее становится поиск; при <code>α = 1</code> свободных ячеек нет. Линейное опробование образует кластеры — подряд идущие занятые ячейки, из-за которых средняя длина пробы растёт. Удаление требует особой пометки «удалено», иначе цепочка поиска разорвётся.</p>
+    <p><b>Квадратичные пробы.</b> Проверяются ячейки <code>(h + 1²) mod m</code>, <code>(h + 2²) mod m</code>, <code>(h + 3²) mod m</code> и так далее. Так не образуются длинные первичные кластеры, но посещается лишь часть ячеек (при простом <code>m</code> — около половины), поэтому ключ может не поместиться, даже когда в таблице есть свободные места.</p>
   </details>
 
   <nav class="pager">
@@ -64,6 +72,7 @@
   const S = window.TreeSite;
   const $ = S.$;
   let method = 'chain';
+  let hv = {}, useAlpha = false;
   let steps = [];
 
   const player = S.mountPlayer($('stage'), {
@@ -84,7 +93,10 @@
     return `<div class="stat"><b>${st.keys}</b><span>ключей в таблице</span></div><div class="stat"><b>${st.collisions}</b><span>коллизий</span></div><div class="stat"><b>${st.alpha.toFixed(2)}</b><span>α = n / m</span></div><div class="stat"><b>${st.probes}</b><span>всего проб</span></div><div class="stat"><b>${st.failed}</b><span>не поместилось</span></div>`;
   }
 
-  function hashOf(ch, m){ return S.code(ch) % m; }
+  function hashOf(ch, m){ return hv[ch] % m; }
+  function valText(ch){
+    return useAlpha ? `Номер буквы «<b>${S.esc(ch)}</b>» в алфавите = ${hv[ch]}` : `Код символа «<b>${S.esc(ch)}</b>» = ${hv[ch]}`;
+  }
 
   function renderChain(table, o){
     o = o || {};
@@ -92,7 +104,7 @@
     let h = '<div class="htable">';
     table.forEach((bucket, i) => {
       const keys = bucket.length
-        ? bucket.map((k, j) => `<span class="hkey${i === hot && j === bucket.length - 1 && newKey ? ' new' : ''}${cmp.has(j) ? ' cmp' : ''}">${S.esc(k)}</span>`).join('<span class="harrow">→</span>')
+        ? bucket.map((k, j) => `<span class="hkey${i === hot && j === bucket.length - 1 && newKey ? ' new' : ''}${cmp.has(j) ? ' cmp' : ''}">${S.fmtLabel(k)}</span>`).join('<span class="harrow">→</span>')
         : '<span class="meta">пусто</span>';
       h += `<div class="hrow"><div class="hnum">${i}</div><div class="hchain${i === hot ? ' hot' : ''}">${keys}</div></div>`;
     });
@@ -109,13 +121,20 @@
       if(probe.has(i)) cls += ' probe';
       if(i === current && k !== null && i !== newIndex) cls += ' collision';
       if(i === newIndex) cls += ' new';
-      h += `<div class="${cls}"><i>${i}</i><b>${k === null ? '·' : S.esc(k)}</b></div>`;
+      h += `<div class="${cls}"><i>${i}</i><b>${k === null ? '·' : S.fmtLabel(k)}</b></div>`;
     });
     return h + '</div>';
   }
 
   function build(){
-    const keys = S.parseChars($('inp').value, 20, true).chars;
+    const caps = S.parseChars($('inp').value, 20, true).chars.map(c => { const u = c.toUpperCase(); return [...u].length === 1 ? u : c; });
+    $('inp').value = caps.join('');
+    const seenCh = {};
+    const keys = caps.map(c => { const k = seenCh[c] = (seenCh[c] || 0) + 1; return c + '′'.repeat(k - 1); });
+    const pos = S.alphaPos(keys);   /* номера букв, если все из одного алфавита */
+    useAlpha = !!pos;
+    hv = {};
+    keys.forEach((k, i) => { hv[k] = pos ? pos[i] : S.code(k); });
     let m = Math.max(3, Math.min(15, parseInt($('size').value, 10) || 7));
     $('size').value = m;
     steps = [];
@@ -147,7 +166,7 @@
     }
     add({
       title:'Пустая хеш-таблица',
-      text:`Размер таблицы <b>m = ${m}</b>, метод — <b>прямое связывание</b>. Каждая ячейка — пустая цепочка.<span class="l">Хеш ключа: <code>h = код(символ) mod ${m}</code>. Все ключи с одинаковым h попадут в одну цепочку.</span>`,
+      text:`Размер таблицы <b>m = ${m}</b>, метод — <b>прямое связывание</b>. Каждая ячейка — пустая цепочка.<span class="l">Хеш ключа: <code>h = ${useAlpha ? 'номер(буква)' : 'код(символа)'} mod ${m}</code>. Все ключи с одинаковым h попадут в одну цепочку.</span>`,
       html: renderChain(table)
     });
 
@@ -155,7 +174,7 @@
       const h = hashOf(ch, m), bucket = table[h];
       add({
         title:`Хеш для «${ch}»`,
-        text:`Код символа «<b>${S.esc(ch)}</b>» = ${S.code(ch)}. Считаем <code>${S.code(ch)} mod ${m} = ${h}</code>. Ключ должен попасть в ячейку <b>${h}</b>.`,
+        text:`${valText(ch)}. Считаем <code>${hv[ch]} mod ${m} = ${h}</code>. Ключ должен попасть в ячейку <b>${h}</b>.`,
         html: renderChain(table, {hot:h})
       });
       if(bucket.length){
@@ -193,6 +212,7 @@
 
   function buildOpen(keys, m){
     const slots = Array(m).fill(null);
+    const quad = $('probe').value === 'quad';
     let collisions = 0, probes = 0, inserted = 0, failed = 0;
     function add(step){
       step.stat = {
@@ -207,7 +227,7 @@
     }
     add({
       title:'Пустая хеш-таблица',
-      text:`Размер таблицы <b>m = ${m}</b>, метод — <b>открытая адресация</b> с линейным опробованием.<span class="l">Если ячейка h занята, проверяем (h + 1) mod m, затем (h + 2) mod m и так далее. Все ключи лежат в самой таблице.</span>`,
+      text:`Размер таблицы <b>m = ${m}</b>, метод — <b>открытая адресация</b> с ${quad ? 'квадратичным' : 'линейным'} опробованием.<span class="l">${quad ? 'Если ячейка h занята, проверяем (h + 1²) mod m, затем (h + 2²) mod m, (h + 3²) mod m и так далее.' : 'Если ячейка h занята, проверяем (h + 1) mod m, затем (h + 2) mod m и так далее.'} Все ключи лежат в самой таблице.</span>`,
       html: renderOpen(slots)
     });
 
@@ -215,10 +235,12 @@
       const h = hashOf(ch, m);
       add({
         title:`Хеш для «${ch}»`,
-        text:`Код символа «<b>${S.esc(ch)}</b>» = ${S.code(ch)}. Стартовая ячейка: <code>${S.code(ch)} mod ${m} = ${h}</code>.`,
+        text:`${valText(ch)}. Стартовая ячейка: <code>${hv[ch]} mod ${m} = ${h}</code>.`,
         html: renderOpen(slots, {current:h, probe:[h]})
       });
-      let pos = h, examined = 0, insertedHere = false, collided = false;
+      const at = i => quad ? (h + i * i) % m : (h + i) % m;
+      let i = 0, pos = h, examined = 0, insertedHere = false, collided = false;
+      const vis = [h];
       while(examined < m){
         probes++;
         examined++;
@@ -228,24 +250,27 @@
           add({
             title:`Свободная ячейка ${pos}`,
             text:`Ячейка <b>${pos}</b> свободна — записываем «<b>${S.esc(ch)}</b>» сюда. Проб: <b>${examined}</b>.`,
-            html: renderOpen(slots, {current:pos, newIndex:pos, probe:probePath(h, pos, m)})
+            html: renderOpen(slots, {current:pos, newIndex:pos, probe:vis.slice()})
           });
           insertedHere = true;
           break;
         }
         if(!collided){ collisions++; collided = true; }
+        i++;
+        const next = at(i);
         add({
           title:`Ячейка ${pos} занята`,
-          text:`В ячейке <b>${pos}</b> уже стоит «<b>${S.esc(slots[pos])}</b>». Коллизия — переходим к следующей ячейке <code>(${pos} + 1) mod ${m} = ${(pos + 1) % m}</code>.`,
-          html: renderOpen(slots, {current:pos, probe:probePath(h, pos, m)})
+          text:`В ячейке <b>${pos}</b> уже стоит «<b>${S.esc(slots[pos])}</b>». Коллизия — проба i = ${i}: <code>${quad ? `(${h} + ${i}²) mod ${m}` : `(${h} + ${i}) mod ${m}`} = ${next}</code>.`,
+          html: renderOpen(slots, {current:pos, probe:vis.slice()})
         });
-        pos = (pos + 1) % m;
+        pos = next;
+        vis.push(pos);
       }
       if(!insertedHere){
         failed++;
         add({
-          title:'Таблица заполнена',
-          text:`За ${m} проб свободной ячейки не нашлось: таблица заполнена. Ключ «<b>${S.esc(ch)}</b>» не добавлен. Для открытой адресации нужен размер больше числа ключей или перехеширование.`,
+          title: quad ? 'Свободная ячейка не найдена' : 'Таблица заполнена',
+          text:`${quad ? `За ${m} проб (i = 0…${m - 1}) свободной ячейки не нашлось. Квадратичные пробы посещают лишь часть ячеек, поэтому ключ «<b>${S.esc(ch)}</b>» не поместился, хотя в таблице могут быть свободные места. Нужен другой размер m (лучше простое число) или перехеширование.` : `За ${m} проб свободной ячейки не нашлось: таблица заполнена. Ключ «<b>${S.esc(ch)}</b>» не добавлен. Для открытой адресации нужен размер больше числа ключей или перехеширование.`}`,
           html: renderOpen(slots, {probe:Array.from({length:m}, (_, i) => i)})
         });
       }
@@ -253,7 +278,7 @@
 
     add({
       title:'Готово: таблица построена',
-      text:`Вставлено ключей: <b>${inserted}</b> из ${keys.length}. Коллизий: <b>${collisions}</b>. Всего проб: <b>${probes}</b>${failed ? `, не поместилось: <b>${failed}</b>` : ''}.<span class="l">Коэффициент заполнения α = ${inserted}/${m} ≈ ${(inserted / m).toFixed(2)}. Линейное опробование образует кластеры: чем выше α, тем длиннее пробы.</span>`,
+      text:`Вставлено ключей: <b>${inserted}</b> из ${keys.length}. Коллизий: <b>${collisions}</b>. Всего проб: <b>${probes}</b>${failed ? `, не поместилось: <b>${failed}</b>` : ''}.<span class="l">Коэффициент заполнения α = ${inserted}/${m} ≈ ${(inserted / m).toFixed(2)}. ${quad ? 'Квадратичное опробование дробит кластеры, но посещает не все ячейки.' : 'Линейное опробование образует кластеры: чем выше α, тем длиннее пробы.'}</span>`,
       html: renderOpen(slots)
     });
   }
@@ -274,12 +299,14 @@
     const b = e.target.closest('[data-method]');
     if(!b) return;
     method = b.dataset.method;
+    $('probeField').style.display = method === 'open' ? '' : 'none';
     [...$('methodTabs').querySelectorAll('.tab')].forEach(x => x.classList.toggle('on', x === b));
     build();
   });
   $('go').onclick = build;
   $('inp').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
   $('size').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
+  $('probe').addEventListener('change', build);
   build();
 })();
 </script>

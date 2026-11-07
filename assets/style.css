@@ -9,20 +9,20 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#1f1e1b;--card:#2a2926;--tx:#ece8de;--mut:#a09b8e;--bd:#3e3b35;
-    --ac:#8fb0cc;--acsoft:#27323c;--ok:#4b8f5d;--oksoft:#233229;
-    --bad:#c4574b;--badsoft:#3b2724;--node:#34312c;--node2:#413d36;
-    --warn:#dfb260;--warnsoft:#3a3220;--vio:#c093b3;--viosoft:#3a2a35;
-    --onac:#1f1e1b;--shadow:0 10px 30px rgba(0,0,0,.35);
+    --bg:#15171a;--card:#1e2125;--tx:#e4e7eb;--mut:#98a0aa;--bd:#323840;
+    --ac:#8fb0cc;--acsoft:#22303d;--ok:#4b8f5d;--oksoft:#1f2f26;
+    --bad:#c4574b;--badsoft:#352426;--node:#272c33;--node2:#323841;
+    --warn:#d9b266;--warnsoft:#342f1f;--vio:#c093b3;--viosoft:#31293a;
+    --onac:#15171a;--shadow:0 10px 30px rgba(0,0,0,.35);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#1f1e1b;--card:#2a2926;--tx:#ece8de;--mut:#a09b8e;--bd:#3e3b35;
-  --ac:#8fb0cc;--acsoft:#27323c;--ok:#4b8f5d;--oksoft:#233229;
-  --bad:#c4574b;--badsoft:#3b2724;--node:#34312c;--node2:#413d36;
-  --warn:#dfb260;--warnsoft:#3a3220;--vio:#c093b3;--viosoft:#3a2a35;
-  --onac:#1f1e1b;--shadow:0 10px 30px rgba(0,0,0,.35);
+  --bg:#15171a;--card:#1e2125;--tx:#e4e7eb;--mut:#98a0aa;--bd:#323840;
+  --ac:#8fb0cc;--acsoft:#22303d;--ok:#4b8f5d;--oksoft:#1f2f26;
+  --bad:#c4574b;--badsoft:#352426;--node:#272c33;--node2:#323841;
+  --warn:#d9b266;--warnsoft:#342f1f;--vio:#c093b3;--viosoft:#31293a;
+  --onac:#15171a;--shadow:0 10px 30px rgba(0,0,0,.35);
   color-scheme:dark;
 }
 :root[data-theme="amoled"]{
@@ -242,9 +242,9 @@ button:disabled{opacity:.38;cursor:default}
 .scrub:focus-visible{outline:2px solid var(--acsoft);border-radius:999px}
 /* Выпадающие списки в тёмных темах: тёмный фон и светлый текст пунктов */
 :root[data-theme="dark"] option,
-:root[data-theme="amoled"] option{background:#2a2926;color:#ece8de}
+:root[data-theme="amoled"] option{background:#1e2125;color:#e4e7eb}
 :root[data-theme="dark"] option:checked,
-:root[data-theme="amoled"] option:checked{background:#413d36;color:#fff}
+:root[data-theme="amoled"] option:checked{background:#323841;color:#fff}
 :root[data-theme="amoled"] .scrub::-webkit-slider-thumb{
   background:#fff;
   border-color:#000;

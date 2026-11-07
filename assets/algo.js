@@ -3,8 +3,11 @@
   'use strict';
   const TS = window.TreeSite;
 
+  /* Ключ элемента: код символа или (в числовом режиме сортировок) само число */
+  TS.numMode = false;
   TS.code = function(ch){
     const s = String(ch);
+    if(TS.numMode) return parseInt(s, 10) || 0;
     return s.codePointAt(0) || 0;
   };
 
@@ -51,6 +54,8 @@
     const done = new Set(step.done || []);
     const tags = step.tags || {};
     const alpha = TS.alphaPos(arr);
+    const maxLen = Math.max.apply(null, arr.map(x => String(x).replace(/′+$/, '').length));
+    const minW = maxLen > 2 ? ` style="min-width:${maxLen * 9 + 12}px"` : '';
     let bars = '';
     arr.forEach((ch, i) => {
       const h = 36 + Math.round((TS.code(ch) - lo) / span * 150);
@@ -59,7 +64,7 @@
       if(move.has(i)) cls += ' move';
       if(done.has(i)) cls += ' done';
       if(step.pivot === i) cls += ' pivot';
-      bars += `<div class="${cls}">${tags[i] ? `<span class="tag">${TS.esc(tags[i])}</span>` : ''}<div class="col" style="height:${h}px"><b>${TS.fmtLabel(ch)}</b></div><span class="ix">${alpha ? alpha[i] : i}</span></div>`;
+      bars += `<div class="${cls}"${minW}>${tags[i] ? `<span class="tag">${TS.esc(tags[i])}</span>` : ''}<div class="col" style="height:${h}px"><b>${TS.fmtLabel(ch)}</b></div><span class="ix">${alpha ? alpha[i] : i}</span></div>`;
     });
     let h = `<div class="bars">${bars}</div>`;
     if(step.caption) h += `<div class="bars-caption">${step.caption}</div>`;
