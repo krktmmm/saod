@@ -213,7 +213,7 @@
       $('mDelta').innerHTML = `На шаге: <b>+${s.dC || 0}</b> сравнений, <b>+${s.dM || 0}</b> перемещений.`;
       if($('gC')){
         $('gC').textContent = s.C || 0; $('gM').textContent = s.M || 0;
-        $('gdC').textContent = `+${s.dC || 0} на шаге`; $('gdM').textContent = `+${s.dM || 0} на шаге`;
+        $('gdC').textContent = `+${s.dC || 0}`; $('gdM').textContent = `+${s.dM || 0}`;
       }
     }
   });
@@ -708,8 +708,7 @@
         <div class="algo-cell"><b>Доп. память</b>${a.mem}</div>
         <div class="algo-cell"><b>Устойчивость</b>${a.stable}</div>
         <div class="algo-cell"><b>Перемещения</b>${a.moves}</div>
-        <div class="algo-cell cnt"><b>C — сравнения</b><span class="num c" id="gC">0</span><span class="dl" id="gdC">+0 на шаге</span></div>
-        <div class="algo-cell cnt"><b>M — перемещения</b><span class="num m" id="gM">0</span><span class="dl" id="gdM">+0 на шаге</span></div>
+        <div class="algo-cell cnt"><b>Счётчики</b><div class="cm"><span title="сравнения">C<span class="num c" id="gC">0</span><span class="dl" id="gdC">+0</span></span><span title="перемещения">M<span class="num m" id="gM">0</span><span class="dl" id="gdM">+0</span></span></div></div>
       </div>`;
   }
 
