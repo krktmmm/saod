@@ -14,41 +14,45 @@
 </header>
 <main>
   <h1>Оптимальное дерево поиска: точный алгоритм</h1>
-  <p class="lead">Каждому ключу задан вес (частота обращения). Нужно построить двоичное дерево поиска с минимальной суммарной стоимостью поиска. Точный алгоритм — динамическое программирование: для каждого отрезка ключей перебираются все варианты корня, а результаты меньших отрезков уже известны.</p>
+  <p class="lead">Вершины V<sub>1</sub>…V<sub>n</sub> упорядочены по ключам (это могут быть любые символы или числа), у каждой есть вес W<sub>j</sub> — частота обращения. Нужно построить двоичное дерево поиска с минимальной взвешенной высотой. Матрицы W<sub>ij</sub>, P<sub>ij</sub> и r<sub>ij</sub> заполняются по рекуррентным формулам, а структуру дерева полностью задаёт матрица корней r<sub>ij</sub>.</p>
 
   <section class="card">
     <div class="row">
       <div class="field">
-        <label for="keys">Ключи (буквы)</label>
-        <input id="keys" value="A B C D E" autocomplete="off" spellcheck="false" placeholder="Например: A B C D E">
+        <label for="keys">Ключи вершин (символы)</label>
+        <input id="keys" value="A B C" autocomplete="off" spellcheck="false" placeholder="Например: A B C или 10 20 30">
       </div>
       <div class="field">
-        <label for="weights">Веса через пробел</label>
-        <input id="weights" value="10 5 2 1 7" autocomplete="off" spellcheck="false" placeholder="Например: 10 5 2 1 7">
+        <label for="weights">Веса W<sub>1</sub>…W<sub>n</sub> через пробел</label>
+        <input id="weights" value="60 30 10" autocomplete="off" spellcheck="false" placeholder="Например: 60 30 10">
       </div>
       <button class="p" id="go" type="button">Построить</button>
       <button id="ex" type="button">Пример</button>
     </div>
-    <div class="msg" id="msg" style="margin-top:9px"></div>
+    <div class="meta" style="margin-top:9px">Ключи можно писать подряд (ABC) или через пробел и запятую (10 20 30); вес вводится в том же порядке. Вершины автоматически упорядочиваются по ключам.</div>
+    <div class="msg" id="msg" style="margin-top:6px"></div>
   </section>
 
   <div id="stage"></div>
 
   <div class="card">
-    <h2>Таблица динамического программирования</h2>
-    <div class="meta">C[i,j] — минимальная стоимость дерева для ключей i…j; под числом указан выбранный корень. W(i,j) — сумма весов отрезка.</div>
+    <h2>Матрицы W<sub>ij</sub>, P<sub>ij</sub>, r<sub>ij</sub></h2>
+    <div class="meta">W<sub>ij</sub> — вес поддерева T<sub>ij</sub>, P<sub>ij</sub> — его взвешенная высота, r<sub>ij</sub> — номер корня. Подсвечена вычисляемая ячейка, зелёным — ячейки, из которых она считается.</div>
     <div id="dp"></div>
   </div>
 
   <details>
-    <summary>Формула и почему алгоритм точный</summary>
-    <p>Для отрезка ключей <code>i…j</code> обозначим <code>W(i,j)</code> сумму их весов. Если корнем выбрать ключ <code>r</code>, его вес войдёт в стоимость один раз, а все ключи левого и правого поддеревьев опустятся на уровень ниже — то есть добавят ещё <code>W(i,j)</code>. Поэтому</p>
-    <p><code>C[i,j] = W(i,j) + min<sub>i≤r≤j</sub> ( C[i,r−1] + C[r+1,j] )</code>, где <code>C[i,i−1]=0</code>.</p>
-    <p>Ячейки заполняются по возрастанию длины отрезка. Оптимальная стоимость — <code>C[0,n−1]</code>, а выбранные корни <code>R[i,j]</code> позволяют восстановить само дерево. Сложность — <code>O(n³)</code>, поэтому точный алгоритм применяют при небольших n.</p>
+    <summary>Формулы и идея алгоритма</summary>
+    <p>Для любого дерева поиска справедливо соотношение <code>P = P<sub>L</sub> + W + P<sub>R</sub></code>, где P<sub>L</sub> и P<sub>R</sub> — взвешенные высоты левого и правого поддеревьев, а W — вес всего дерева: оба поддерева опускаются на уровень ниже и добавляют свой вес ещё раз.</p>
+    <p>Через T<sub>ij</sub> обозначено оптимальное поддерево из вершин V<sub>i+1</sub>…V<sub>j</sub>, через W<sub>ij</sub> и P<sub>ij</sub> — его вес и взвешенная высота. Поддерево T<sub>ii</sub> пустое: W<sub>ii</sub> = 0, P<sub>ii</sub> = 0. Для 0 ≤ i &lt; j ≤ n:</p>
+    <p><code>(1) W<sub>ij</sub> = W<sub>i,j−1</sub> + W<sub>j</sub></code></p>
+    <p><code>(2) P<sub>ij</sub> = W<sub>ij</sub> + min<sub>i&lt;k≤j</sub> (P<sub>i,k−1</sub> + P<sub>k,j</sub>)</code></p>
+    <p>Значение k*, при котором достигается минимум, записывается в матрицу r<sub>ij</sub>: это номер корня поддерева T<sub>ij</sub> в упорядоченном массиве вершин. При равенстве берётся наименьшее k.</p>
+    <p><b>Построение дерева по матрице r.</b> Корень всего дерева — вершина с номером k = r<sub>0,n</sub>. Её левое поддерево описывает r<sub>0,k−1</sub>, правое — r<sub>k,n</sub>, и так далее для каждого отрезка (i, j), пока i &lt; j. Если i = j, поддерево пустое. Сложность вычисления матриц — O(n³).</p>
   </details>
 
   <nav class="pager">
-    <a href="btree.html">← B-дерево</a>
+    <a href="btree-m.html">← Б-дерево порядка m</a>
     <a href="optimal-approx.html">Приближённые алгоритмы →</a>
   </nav>
 </main>
@@ -58,11 +62,15 @@
   'use strict';
   const S = window.TreeSite;
   const $ = S.$;
-  let keys = [], weights = [], weightMap = {}, seq = 0, root = null;
-  const mk = d => ({id:++seq, d, l:null, r:null});
+  const nz = x => Math.round(x * 1e6) / 1e6;
+  let n = 0, w = [], keys = [], weightMap = {}, seq = 0, root = null;
+  const mk = d => ({id:++seq, d:String(d), l:null, r:null});
+  const sb = (a, b) => `<sub>${a},${b}</sub>`;
+  const grid = () => Array.from({length:n + 1}, () => Array(n + 1).fill(null));
+  const cp = m => m.map(r => r.slice());
 
   const player = S.mountPlayer($('stage'), {
-    legend: '<span><i class="dot" style="background:var(--ok)"></i>созданный узел</span><span><i class="dot" style="background:var(--ac)"></i>границы текущего отрезка</span><span>под узлом — вес ключа</span>',
+    legend: '<span><i class="dot" style="background:var(--ok)"></i>созданная вершина</span><span><i class="dot" style="background:var(--ac)"></i>вершины текущего поддерева T<sub>ij</sub></span><span>под вершиной — её вес W<sub>j</sub></span>',
     render(canvas, step){
       canvas.classList.toggle('compact', !step.tree);
       canvas.innerHTML = (step.strip || '') + '<div class="tree-host"></div>';
@@ -71,22 +79,48 @@
       else host.innerHTML = '';
     },
     onStep(step){
-      const dp = step.dp;
-      if(dp && keys.length) S.renderDPTable($('dp'), {keys, C:dp.C, R:dp.R, n:keys.length, cur:step.curCell});
+      if(step.dp && n) renderMats($('dp'), step.dp);
       else $('dp').innerHTML = '';
     }
   });
 
+  function renderMats(el, d){
+    const hot = new Set((d.hot || []).map(c => c.join(',')));
+    const use = new Set((d.use || []).map(c => c.join(',')));
+    function tbl(title, M, key){
+      let h = `<div class="mat"><div class="mat-t">${title}</div><div class="table-wrap"><table class="dp"><thead><tr><th>i\\j</th>`;
+      for(let j = 0; j <= d.n; j++) h += `<th>${j}</th>`;
+      h += '</tr></thead><tbody>';
+      for(let i = 0; i <= d.n; i++){
+        h += `<tr><th>${i}</th>`;
+        for(let j = 0; j <= d.n; j++){
+          if(j < i){ h += '<td class="na"></td>'; continue; }
+          const v = M[i][j], c = [];
+          if(v !== null) c.push('done');
+          if((d.curM === key || (d.curM === 'P' && key === 'R')) && hot.has(i + ',' + j)) c.push('cur');
+          if(key === 'P' && use.has(i + ',' + j)) c.push('use');
+          h += `<td${c.length ? ` class="${c.join(' ')}"` : ''}>${v === null ? '' : v}</td>`;
+        }
+        h += '</tr>';
+      }
+      return h + '</tbody></table></div></div>';
+    }
+    el.innerHTML = `<div class="mats">${tbl('W<sub>ij</sub> — вес поддерева', d.W, 'W')}${tbl('P<sub>ij</sub> — взвешенная высота', d.P, 'P')}${tbl('r<sub>ij</sub> — номер корня', d.R, 'R')}</div>`;
+  }
+
   function readInput(){
-    const raw = [...String($('keys').value)].filter(c => !/[\s,;]/.test(c));
-    const w = String($('weights').value).trim().split(/[\s,;]+/).filter(Boolean).map(Number);
-    if(!raw.length) return {error:'Введите хотя бы один ключ.'};
-    if(raw.length > 10) return {error:'Для таблицы DP допускается не больше 10 ключей.'};
-    if(new Set(raw).size !== raw.length) return {error:'Ключи не должны повторяться.'};
-    if(w.length !== raw.length) return {error:`Ключей ${raw.length}, а весов ${w.length}. Введите по одному весу на каждый ключ.`};
-    if(w.some(x => !Number.isFinite(x) || x < 0)) return {error:'Веса должны быть неотрицательными числами.'};
-    const pairs = raw.map((k, i) => ({k, w:w[i]})).sort((a, b) => a.k.codePointAt(0) - b.k.codePointAt(0));
-    return {keys:pairs.map(p => p.k), weights:pairs.map(p => p.w)};
+    const split = raw => { raw = String(raw).trim(); return /[\s,;]/.test(raw) ? raw.split(/[\s,;]+/).filter(Boolean) : [...raw]; };
+    const kt = split($('keys').value);
+    const wt = String($('weights').value).trim().split(/[\s,;]+/).filter(Boolean);
+    if(!kt.length) return {error:'Введите хотя бы один ключ.'};
+    if(kt.length > 10) return {error:'Допускается не больше 10 вершин.'};
+    if(new Set(kt).size !== kt.length) return {error:'Ключи не должны повторяться.'};
+    if(wt.length !== kt.length) return {error:`Ключей ${kt.length}, а весов ${wt.length}. Введите по одному весу на каждый ключ.`};
+    const x = wt.map(Number);
+    if(x.some(v => !Number.isFinite(v) || v < 0)) return {error:'Веса должны быть неотрицательными числами.'};
+    const numeric = kt.every(t => /^-?\d+(\.\d+)?$/.test(t));
+    const pairs = kt.map((k, i) => ({k, w:x[i]})).sort((a, b) => numeric ? a.k - b.k : (a.k < b.k ? -1 : a.k > b.k ? 1 : 0));
+    return {keys:pairs.map(p => p.k), w:pairs.map(p => p.w)};
   }
 
   function build(){
@@ -95,108 +129,131 @@
     if(input.error){
       msg.className = 'msg bad';
       msg.textContent = input.error;
-      keys = []; weights = []; weightMap = {};
+      n = 0; w = []; keys = []; weightMap = {};
       $('dp').innerHTML = '';
       player.setSteps([{title:'Проверьте ввод', text:S.esc(input.error), tree:null}]);
       return;
     }
+    w = input.w; keys = input.keys; n = w.length; weightMap = {};
+    keys.forEach((k, i) => { weightMap[k] = w[i]; });
+    const total = nz(w.reduce((a, b) => a + b, 0));
     msg.className = 'msg';
-    msg.innerHTML = `Ключи отсортированы: <b>${input.keys.map(S.esc).join(' ')}</b>. Суммарный вес: <b>${input.weights.reduce((a, b) => a + b, 0)}</b>.`;
-    keys = input.keys; weights = input.weights;
-    weightMap = {};
-    keys.forEach((k, i) => { weightMap[k] = weights[i]; });
+    msg.innerHTML = `Вершины по ключам: <b>${keys.map(S.esc).join(' ')}</b>. Суммарный вес W = <b>${total}</b>.`;
 
-    const n = keys.length;
-    const C = Array.from({length:n}, () => Array(n).fill(null));
-    const R = Array.from({length:n}, () => Array(n).fill(null));
-    const pref = [0];
-    for(let i = 0; i < n; i++) pref.push(pref[i] + weights[i]);
-    const W = (i, j) => pref[j + 1] - pref[i];
+    const items = w.map((v, i) => ({k:keys[i], w:v}));
+    const Wm = grid(), Pm = grid(), Rm = grid();
+    const snap = (cur) => Object.assign({n, W:cp(Wm), P:cp(Pm), R:cp(Rm)}, cur || {});
     const steps = [];
-    const items = keys.map((k, i) => ({k, w:weights[i]}));
-    const emptyDP = () => ({C:C.map(r => r.slice()), R:R.map(r => r.slice())});
 
     steps.push({
-      title:'Шаг 0. Подготовка',
-      text:`Ключи упорядочены по возрастанию: <b>${keys.map(S.esc).join(' ')}</b>; веса: <b>${weights.join(' ')}</b>.<span class="l">Заполняем таблицу C по возрастанию длины отрезка. Для пустого отрезка стоимость равна 0.</span>`,
+      title:'Исходные данные',
+      text:`Вершины V<sub>1</sub>, …, V<sub>${n}</sub> упорядочены по ключам: ${keys.map((k, i) => `V<sub>${i + 1}</sub> = «${S.esc(k)}» (W<sub>${i + 1}</sub> = ${w[i]})`).join(', ')}; общий вес W = ${total}.<span class="l">T<sub>ij</sub> — оптимальное поддерево из вершин V<sub>i+1</sub>…V<sub>j</sub>, W<sub>ij</sub> — его вес, P<sub>ij</sub> — взвешенная высота (сумма вес · (глубина + 1)). Для любого дерева P = P<sub>L</sub> + W + P<sub>R</sub>.</span>`,
       strip:S.strip(items),
       tree:null,
-      dp:emptyDP()
+      dp:snap()
     });
 
+    for(let i = 0; i <= n; i++){ Wm[i][i] = 0; Pm[i][i] = 0; Rm[i][i] = 0; }
+    steps.push({
+      title:'Пустые поддеревья',
+      text:`T<sub>ii</sub> — пустое поддерево, поэтому W<sub>ii</sub> = 0, P<sub>ii</sub> = 0 и r<sub>ii</sub> = 0 для всех i = 0…${n}.<span class="l">Дальше сначала считаем веса W<sub>ij</sub> по формуле (1), затем взвешенные высоты P<sub>ij</sub> по формуле (2).</span>`,
+      strip:S.strip(items),
+      tree:null,
+      dp:snap({curM:'W', hot:Array.from({length:n + 1}, (_, i) => [i, i])})
+    });
+
+    for(let i = 0; i < n; i++){
+      const lines = [], hot = [];
+      for(let j = i + 1; j <= n; j++){
+        const prev = Wm[i][j - 1];
+        Wm[i][j] = nz(prev + w[j - 1]);
+        lines.push(`W${sb(i, j)} = W${sb(i, j - 1)} + W<sub>${j}</sub> = ${prev} + ${w[j - 1]} = <b>${Wm[i][j]}</b>`);
+        hot.push([i, j]);
+      }
+      steps.push({
+        title:`Веса W: строка i = ${i}`,
+        text:`По формуле (1) W<sub>ij</sub> = W<sub>i,j−1</sub> + W<sub>j</sub>:<span class="l">${lines.join('<br>')}</span>`,
+        strip:S.strip(items, {lo:i, hi:n - 1}),
+        tree:null,
+        dp:snap({curM:'W', hot})
+      });
+    }
+
     for(let len = 1; len <= n; len++){
-      for(let i = 0; i + len - 1 < n; i++){
-        const j = i + len - 1;
-        const sum = W(i, j);
-        let best = Infinity, bestR = i;
-        const cands = [];
-        for(let r = i; r <= j; r++){
-          const left = r > i ? C[i][r - 1] : 0;
-          const right = r < j ? C[r + 1][j] : 0;
-          const val = sum + left + right;
-          cands.push({r, left, right, val});
-          if(val < best){ best = val; bestR = r; }
+      for(let i = 0; i + len <= n; i++){
+        const j = i + len, sum = Wm[i][j];
+        let best = Infinity, bk = i + 1;
+        const cands = [], use = [];
+        for(let k = i + 1; k <= j; k++){
+          const L = Pm[i][k - 1], R = Pm[k][j], val = nz(L + R);
+          cands.push({k, L, R, val});
+          use.push([i, k - 1], [k, j]);
+          if(val < best){ best = val; bk = k; }
         }
-        C[i][j] = best; R[i][j] = bestR;
-        const lines = cands.map(c =>
-          `Корень «${S.esc(keys[c.r])}»: W=${sum} + C[${i},${c.r - 1}]=${c.left} + C[${c.r + 1},${j}]=${c.right} → <b>${c.val}</b>${c.val === best ? ' ← минимум' : ''}`
-        );
+        Pm[i][j] = nz(sum + best); Rm[i][j] = bk;
+        const lines = cands.map(c => `k = ${c.k}: P${sb(i, c.k - 1)} + P${sb(c.k, j)} = ${c.L} + ${c.R} = ${c.val}${c.k === bk ? ' ← минимум' : ''}`);
         steps.push({
-          title:`DP: отрезок [${i}..${j}] (длина ${len})`,
-          text:`W(${i},${j}) = <b>${sum}</b>. Перебираем возможные корни:<span class="l">${lines.join('<br>')}</span><br>Выбираем «<b>${S.esc(keys[bestR])}</b>»: C[${i},${j}] = <b>${best}</b>, R[${i},${j}] = ${bestR}.`,
-          strip:S.strip(items, {lo:i, hi:j, mid:bestR}),
+          title:`P${sb(i, j)}: поддерево V<sub>${i + 1}</sub>…V<sub>${j}</sub>`,
+          text:`P${sb(i, j)} = W${sb(i, j)} + min<sub>${i}&lt;k≤${j}</sub>(P<sub>${i},k−1</sub> + P<sub>k,${j}</sub>), W${sb(i, j)} = <b>${sum}</b>.<span class="l">${lines.join('<br>')}</span>P${sb(i, j)} = ${sum} + ${best} = <b>${Pm[i][j]}</b>, k* = <b>${bk}</b>, значит r${sb(i, j)} = ${bk}.`,
+          strip:S.strip(items, {lo:i, hi:j - 1, mid:bk - 1}),
           tree:null,
-          dp:{C:C.map(r => r.slice()), R:R.map(r => r.slice())},
-          curCell:[i, j]
+          dp:snap({curM:'P', hot:[[i, j]], use})
         });
       }
     }
 
-    const finalDP = {C:C.map(r => r.slice()), R:R.map(r => r.slice())};
     steps.push({
-      title:'Таблица заполнена',
-      text:`Минимальная стоимость поиска C[0,${n - 1}] = <b>${C[0][n - 1]}</b>. Корень всего дерева — «<b>${S.esc(keys[R[0][n - 1]])}</b>».<span class="l">Теперь по таблице R восстанавливаем структуру дерева: R[i,j] — оптимальный корень отрезка [i..j].</span>`,
+      title:'Матрицы заполнены',
+      text:`P<sub>0,${n}</sub> = <b>${Pm[0][n]}</b> — взвешенная высота оптимального дерева, r<sub>0,${n}</sub> = <b>${Rm[0][n]}</b> — номер его корня.<span class="l">Матрица корней r<sub>ij</sub> полностью определяет структуру дерева: корень отрезка (i, j) — вершина k = r<sub>ij</sub>, левое поддерево — отрезок (i, k−1), правое — отрезок (k, j).</span>`,
       strip:S.strip(items),
       tree:null,
-      dp:finalDP
+      dp:snap({curM:'R', hot:[[0, n]]})
     });
 
     seq = 0; root = null;
     function restore(i, j, parent, dir, depth){
-      if(i > j) return;
-      const r = R[i][j];
-      const node = mk(keys[r]);
+      if(i >= j) return;
+      const k = Rm[i][j];
+      const node = mk(keys[k - 1]);
       if(parent){ if(dir < 0) parent.l = node; else parent.r = node; } else root = node;
       const where = parent ? (dir < 0 ? 'левым потомком' : 'правым потомком') : 'корнем дерева';
+      const left = k - 1 > i ? `T${sb(i, k - 1)} (вершины V<sub>${i + 1}</sub>…V<sub>${k - 1}</sub>)` : `T${sb(i, k - 1)} (пусто)`;
+      const right = k < j ? `T${sb(k, j)} (вершины V<sub>${k + 1}</sub>…V<sub>${j}</sub>)` : `T${sb(k, j)} (пусто)`;
       steps.push({
-        title:`Восстановление: узел «${keys[r]}»`,
-        text:`Для отрезка [${i}..${j}] таблица даёт корень r=${r} — «<b>${S.esc(keys[r])}</b>» (вес ${weights[r]}).<span class="l">Он становится ${where} на глубине ${depth}. Слева строим [${i}..${r - 1}], справа — [${r + 1}..${j}].</span>`,
-        strip:S.strip(items, {lo:i, hi:j, mid:r}),
+        title:`r${sb(i, j)} = ${k}: вершина V<sub>${k}</sub> («${S.esc(keys[k - 1])}»)`,
+        text:`Для отрезка (${i}, ${j}) в матрице корней r${sb(i, j)} = <b>${k}</b>: вершина V<sub>${k}</sub> с ключом «<b>${S.esc(keys[k - 1])}</b>» (вес ${w[k - 1]}) становится ${where}.<span class="l">Глубина ${depth}. Слева строим ${left}, справа — ${right}.</span>`,
+        strip:S.strip(items, {lo:i, hi:j - 1, mid:k - 1}),
         tree:S.clone(root),
         newId:node.id,
-        dp:finalDP,
-        curCell:[i, j]
+        tags:{[node.id]:`(${i},${j})`},
+        dp:snap({curM:'R', hot:[[i, j]]})
       });
-      restore(i, r - 1, node, -1, depth + 1);
-      restore(r + 1, j, node, 1, depth + 1);
+      restore(i, k - 1, node, -1, depth + 1);
+      restore(k, j, node, 1, depth + 1);
     }
-    restore(0, n - 1, null, 0, 0);
+    restore(0, n, null, 0, 0);
 
-    const realCost = S.weightedCost(root, weightMap);
+    const realCost = nz(S.weightedCost(root, weightMap));
     steps.push({
       title:'Готово: оптимальное дерево построено',
-      text:`Стоимость C[0,${n - 1}] = <b>${C[0][n - 1]}</b>; проверка по дереву: Σ w<sub>i</sub>·(глубина<sub>i</sub>+1) = <b>${realCost}</b>. Высота H = <b>${S.height(root)}</b>, средняя глубина <b>${S.avgDepth(root).toFixed(2)}</b>.<span class="l">Для заданных весов дерево оптимально: ни один другой двоичный вид дерева поиска не даёт меньшей суммарной стоимости.</span>`,
-      strip:S.strip(items, {done:keys.map((_, i) => i)}),
+      text:`Сумма W<sub>j</sub> · (глубина + 1) по построенному дереву равна <b>${realCost}</b> и совпадает с P<sub>0,${n}</sub> = ${Pm[0][n]}. Высота H = <b>${S.height(root)}</b>, средняя глубина <b>${S.avgDepth(root).toFixed(2)}</b>.<span class="l">Для заданных весов ни одно другое двоичное дерево поиска не даёт меньшей взвешенной высоты.</span>`,
+      strip:S.strip(items, {done:items.map((_, i) => i)}),
       tree:S.clone(root),
-      dp:finalDP
+      dp:snap({curM:'R', hot:[]})
     });
     player.setSteps(steps);
   }
 
+  function randomInput(){
+    const k = 4 + Math.floor(Math.random() * 4);
+    $('keys').value = S.randLetters(k, {sep:' '});
+    $('weights').value = Array.from({length:k}, () => 1 + Math.floor(Math.random() * 99)).join(' ');
+  }
   $('go').onclick = build;
-  $('ex').onclick = () => { $('keys').value = 'A B C D E F'; $('weights').value = '5 2 10 1 7 3'; build(); };
-  $('keys').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
+  $('ex').onclick = () => { randomInput(); build(); };
   $('weights').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
+  $('keys').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
+  randomInput();
   build();
 })();
 </script>
