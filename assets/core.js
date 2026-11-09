@@ -367,7 +367,7 @@
       if(!btn) return;
       const th = current();
       btn.innerHTML = ICONS[th];
-      btn.title = th === 'light' ? 'Тёмная тема' : th === 'dark' ? 'AMOLED-тема' : 'Светлая тема';
+      btn.title = 'Сменить тему';
     }
     try{
       const saved = localStorage.getItem('tree-theme');
