@@ -205,7 +205,10 @@
         const cw = c.keys.length * CELL + PAD * 2;
         const cx = c._cx + ox, cy = 22 + c._d * LEVEL;
         const x1 = x - w / 2 + PAD + i * CELL;
-        edges += `<line x1="${x1}" y1="${y + NH}" x2="${cx}" y2="${cy}" stroke="var(--mut)" stroke-width="1.4" opacity=".75"/>`;
+        if(dots){
+          const dx = cx - x1, dy = cy - (y + NH), len = Math.hypot(dx, dy) || 1;
+          edges += `<line x1="${x1}" y1="${y + NH}" x2="${cx - dx / len * 2}" y2="${cy - dy / len * 2}" stroke="var(--tx)" stroke-width="1.1" marker-end="url(#bah)"/>`;
+        } else edges += `<line x1="${x1}" y1="${y + NH}" x2="${cx}" y2="${cy}" stroke="var(--mut)" stroke-width="1.4" opacity=".75"/>`;
         walk(c);
       });
     })(t);
@@ -230,7 +233,8 @@
       n.ch.forEach(walk);
     })(t);
 
-    el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">${edges}${nodes}</svg>`;
+    const defs = dots ? '<defs><marker id="bah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="var(--tx)" stroke-width="1.3"/></marker></defs>' : '';
+    el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">${defs}${edges}${nodes}</svg>`;
   };
 
   /* ---------- Таблица динамического программирования ---------- */

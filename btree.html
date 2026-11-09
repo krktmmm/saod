@@ -84,7 +84,7 @@
     let e = '', v = '';
     function arrow(a, b, hor){
       const dx = X(b) - X(a), dy = Y(b) - Y(a), L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
-      e += `<line x1="${X(a) + ux * R}" y1="${Y(a) + uy * R}" x2="${X(b) - ux * (R + 1)}" y2="${Y(b) - uy * (R + 1)}" stroke="var(--tx)" stroke-width="1.7" marker-end="url(#ah)"/>`;
+      e += `<line x1="${X(a) + ux * R}" y1="${Y(a) + uy * R}" x2="${X(b) - ux * (R + 1)}" y2="${Y(b) - uy * (R + 1)}" stroke="var(--tx)" stroke-width="1.1" marker-end="url(#ah)"/>`;
     }
     (function walk(n){
       if(!n) return;
@@ -104,7 +104,7 @@
       v += `<text x="${cx}" y="${cy + 35}" text-anchor="middle" font-size="11.5" fill="var(--mut)">bal ${n.b}</text>`;
       if(tags[n.id]) v += `<text x="${cx - 25}" y="${cy - 13}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ac)">${esc(tags[n.id])}</text>`;
     })(t);
-    const mark = (id, col) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`;
+    const mark = (id, col) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`;
     el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img"><defs>${mark('ah', 'var(--tx)')}</defs>${e}${v}</svg>`;
   }
 
