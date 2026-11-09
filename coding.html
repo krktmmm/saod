@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Кодирование — Шеннон, Фано, Хаффман, Гилберт—Мур</title>
+<title>Кодирование — Шеннон, Фано, Хаффман, Гилберт-Мур</title>
 <link rel="stylesheet" href="assets/style.css">
     <link rel="icon" href="assets/favicon.ico">
 </head>
@@ -15,7 +15,7 @@
 </header>
 <main>
   <h1>Кодирование по шагам</h1>
-  <p class="lead">Четыре кода: Шеннона, Фано, Хаффмана и Гилберта—Мура. Вероятности символов оцениваются по частотам с точностью до двух знаков. Для каждого кода проверяется неравенство Крафта, вычисляется средняя длина кодового слова и сравнивается с энтропией и остальными кодами.</p>
+  <p class="lead">Четыре кода: Шеннона, Фано, Хаффмана и Гилберта-Мура. Вероятности символов оцениваются по частотам с точностью до двух знаков. Для каждого кода проверяется неравенство Крафта, вычисляется средняя длина кодового слова и сравнивается с энтропией и остальными кодами.</p>
 
   <section class="card">
     <div class="row">
@@ -26,14 +26,14 @@
       <button class="p" id="go" type="button">Построить</button>
       <button id="ex" type="button">Пример</button>
     </div>
-    <div class="meta" style="margin-top:9px">До 40 символов, повторы разрешены — именно частота повтора задаёт вероятность. p<sub>i</sub> = n<sub>i</sub> / N с округлением до 0,01.</div>
+    <div class="meta" style="margin-top:9px">До 40 символов, повторы разрешены (именно частота повтора задаёт вероятность). p<sub>i</sub> = n<sub>i</sub> / N с округлением до 0,01.</div>
   </section>
 
   <div class="row tabs wrap" id="codeTabs" role="tablist" aria-label="Метод кодирования">
     <button type="button" class="tab on" data-code="shannon">Шеннон</button>
     <button type="button" class="tab" data-code="fano">Фано</button>
     <button type="button" class="tab" data-code="huffman">Хаффман</button>
-    <button type="button" class="tab" data-code="gm">Гилберт—Мур</button>
+    <button type="button" class="tab" data-code="gm">Гилберт-Мур</button>
   </div>
 
   <section class="card" id="codeInfo"></section>
@@ -83,7 +83,7 @@
   </details>
 
   <details>
-    <summary>Код Гилберта—Мура</summary>
+    <summary>Код Гилберта-Мура</summary>
     <p>Символы остаются в исходном (алфавитном) порядке — сортировать их не нужно. Для каждого символа берётся середина его интервала: <code>Q<sub>i</sub> = p<sub>1</sub> + … + p<sub>i−1</sub> + p<sub>i</sub>/2</code>. Длина слова <code>l<sub>i</sub> = ⌈−log₂p<sub>i</sub>⌉ + 2</code>, а само слово — первые l<sub>i</sub> бит двоичной записи Q<sub>i</sub>.</p>
     <p>Запасной разряд гарантирует, что двоичный интервал кодового слова целиком лежит внутри интервала символа, — код всегда префиксный. Средняя длина у Гилберта—Мура заметно больше, чем у Хаффмана, зато код назначается по алфавиту без перестроения (в варианте Шеннона—Фано—Элиаса с одним запасным разрядом <code>L ≤ H + 2</code>).</p>
   </details>
@@ -108,8 +108,8 @@
   const INFO = {
     shannon:{
       name:'Код Шеннона',
-      idea:'Символы упорядочиваются по убыванию вероятности. Длина слова l<sub>i</sub> = ⌈−log₂p<sub>i</sub>⌉, а само слово — первые l<sub>i</sub> бит двоичной дроби накопленной вероятности Q<sub>i</sub> = p<sub>1</sub> + … + p<sub>i−1</sub>.',
-      len:'l<sub>i</sub> = ⌈−log₂p<sub>i</sub>⌉',
+      idea:'Символы упорядочиваются по убыванию вероятности. Длина слова l<sub>i</sub> = ⌈-log₂p<sub>i</sub>⌉, а само слово — первые l<sub>i</sub> бит двоичной дроби накопленной вероятности Q<sub>i</sub> = p<sub>1</sub> + … + p<sub>i-1</sub>.',
+      len:'l<sub>i</sub> = ⌈-log₂p<sub>i</sub>⌉',
       order:'по убыванию p<sub>i</sub>',
       bound:'L &lt; H + 1',
       feat:'длины считаются напрямую, без дерева'
@@ -132,8 +132,8 @@
     },
     gm:{
       name:'Код Гилберта—Мура',
-      idea:'Символы остаются в исходном порядке. Берётся середина интервала символа Q<sub>i</sub> = p<sub>1</sub> + … + p<sub>i−1</sub> + p<sub>i</sub>/2, длина l<sub>i</sub> = ⌈−log₂p<sub>i</sub>⌉ + 2, код — первые l<sub>i</sub> бит двоичной записи Q<sub>i</sub>.',
-      len:'l<sub>i</sub> = ⌈−log₂p<sub>i</sub>⌉ + 2',
+      idea:'Символы остаются в исходном порядке. Берётся середина интервала символа Q<sub>i</sub> = p<sub>1</sub> + … + p<sub>i-1</sub> + p<sub>i</sub>/2, длина l<sub>i</sub> = ⌈-log₂p<sub>i</sub>⌉ + 2, код — первые l<sub>i</sub> бит двоичной записи Q<sub>i</sub>.',
+      len:'l<sub>i</sub> = ⌈-log₂p<sub>i</sub>⌉ + 2',
       order:'исходный (алфавитный)',
       bound:'L &gt; H, код всегда префиксный',
       feat:'без сортировки, по алфавиту'
