@@ -581,6 +581,12 @@
     activeN = amoled ? Math.min(parts.length, 60) : parts.length;
     let mx = -1e4, my = -1e4;
     window.addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+    /* на сенсорных экранах mouseleave не срабатывает: сбрасываем позицию, когда палец оторван */
+    const release = e => { if(!e || e.pointerType !== 'mouse'){ mx = -1e4; my = -1e4; } };
+    window.addEventListener('pointerup', release, {passive:true});
+    window.addEventListener('pointercancel', release, {passive:true});
+    window.addEventListener('touchend', () => { mx = -1e4; my = -1e4; }, {passive:true});
+    window.addEventListener('touchcancel', () => { mx = -1e4; my = -1e4; }, {passive:true});
     document.documentElement.addEventListener('mouseleave', () => { mx = -1e4; my = -1e4; });
 
     /* Магнитное поле: внутри радиуса — пружина к центру курсора с демпфированием
