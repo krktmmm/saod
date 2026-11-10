@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Структуры данных — массив, список, стек, очередь</title>
+<link rel="stylesheet" href="assets/style.css">
+    <link rel="icon" href="assets/favicon.ico">
+</head>
+<body>
+<header class="topbar">
+  <a class="back" href="index.html">← Все разделы</a>
+  <span class="crumb">Структуры данных</span>
+  <button class="theme" id="themeBtn" type="button" title="Сменить тему">☾</button>
+</header>
+<main>
+  <h1>Массив, список, стек, очередь</h1>
+  <p class="lead">Четыре способа хранить набор элементов. Выберите структуру, добавляйте и удаляйте элементы и смотрите, что при этом происходит с памятью. Под схемой написано, сколько работы потребовала операция.</p>
+
+  <div class="row tabs wrap" id="tabs" role="tablist" aria-label="Структура данных">
+    <button type="button" class="tab on" data-tab="array">Массив</button>
+    <button type="button" class="tab" data-tab="list">Список</button>
+    <button type="button" class="tab" data-tab="stack">Стек</button>
+    <button type="button" class="tab" data-tab="queue">Очередь</button>
+  </div>
+
+  <section class="card" id="info"></section>
+
+  <section class="card">
+    <div class="dsctl" id="ctl"></div>
+    <div class="dsview" id="view" style="margin-top:12px"></div>
+  </section>
+  <section class="card explain"><div class="step-text" id="msg" aria-live="polite"></div></section>
+
+  <section class="card">
+    <h2>Чем они отличаются</h2>
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead><tr><th></th><th>Массив</th><th>Список</th><th>Стек</th><th>Очередь</th></tr></thead>
+        <tbody>
+          <tr><td>Память</td><td>выделена заранее, одним блоком</td><td>по одному узлу, узлы разбросаны</td><td>как у списка или массива</td><td>как у списка или кольцевого массива</td></tr>
+          <tr><td>Размер</td><td>задаётся при создании</td><td>растёт и убывает</td><td>растёт и убывает</td><td>растёт и убывает</td></tr>
+          <tr><td>Доступ по номеру</td><td>O(1)</td><td>O(n)</td><td>только вершина</td><td>только голова</td></tr>
+          <tr><td>Вставка в начало</td><td>O(n), сдвиг</td><td>O(1)</td><td>push: O(1)</td><td>нет</td></tr>
+          <tr><td>Вставка в конец</td><td>O(1), пока есть место</td><td>O(n), с указателем на хвост O(1)</td><td>нет</td><td>O(1)</td></tr>
+          <tr><td>Удаление первого</td><td>O(n), сдвиг</td><td>O(1)</td><td>pop: O(1)</td><td>O(1)</td></tr>
+          <tr><td>Нужные указатели</td><td>адрес начала блока</td><td>head</td><td>top</td><td>head и tail</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html">← Все разделы</a>
+    <a href="test.html">Общий тест →</a>
+  </nav>
+</main>
+<script src="assets/core.js"></script>
+<script>
+(function(){
+  'use strict';
+  const S = window.TreeSite, $ = S.$, esc = S.esc;
+  const CAP = 8, LIM = 10;
+  let tab = 'array', ctr = 0, hot = -1, kind = '';
+  const D = {array:[], list:[], stack:[], queue:[]};
+  const addr = () => '0x' + (0x1000 + Math.floor(Math.random() * 0xE000)).toString(16).toUpperCase();
+  const pl = n => n === 1 ? 'элемент' : n > 1 && n < 5 ? 'элемента' : 'элементов';
+  const FULL = `Все ${CAP} ячеек заняты. Размер массива задаётся при создании, поэтому для новых элементов придётся выделить блок побольше и скопировать в него всё содержимое.`;
+  const LIMIT = `На схеме помещается не больше ${LIM} элементов. В настоящей структуре этого предела нет.`;
+
+  const INFO = {
+    array:['Массив', 'Один непрерывный блок памяти, размер которого задают при создании. Ячейки одного типа идут подряд, поэтому адрес i-й вычисляется сразу: база + i·размер. Читать по номеру быстро, а вставка и удаление в середине сдвигают всё, что стоит правее. Когда место кончилось, нужен новый, больший блок.'],
+    list:['Односвязный список', 'Каждый узел хранит значение и адрес следующего узла. Память выделяется по одному узлу и в любой момент, поэтому узлы лежат где придётся. Вставка и удаление у известного узла меняют один-два указателя. Зато чтобы добраться до i-го узла, нужно пройти все предыдущие.'],
+    stack:['Стек', 'Принцип LIFO: последним пришёл, первым вышел. Доступна только вершина. Обычно стек делают списком, у которого голова и есть вершина, так что хватает одного указателя. Операции push и pop занимают O(1).'],
+    queue:['Очередь', 'Принцип FIFO: первым пришёл, первым вышел. Добавляют в хвост, берут из головы. Чтобы обе операции занимали O(1), хранят указатели на оба конца списка.']
+  };
+
+  function val(){
+    let v = $('v').value.trim().slice(0, 3);
+    if(!v) v = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[ctr++ % 26];
+    $('v').value = '';
+    return v;
+  }
+  function idx(){ const i = parseInt($('ix') ? $('ix').value : '', 10); return isNaN(i) ? null : i; }
+  function say(m, h, k){ $('msg').innerHTML = m; hot = h === undefined ? -1 : h; kind = k || ''; draw(); }
+
+  const ACT = {
+    array:{
+      add(){
+        const a = D.array; if(a.length >= CAP) return say(FULL);
+        const v = val(); a.push(v);
+        say(`Записали «<b>${esc(v)}</b>» в ячейку ${a.length - 1}. Остальные элементы не трогали: одна операция.`, a.length - 1);
+      },
+      ins(){
+        const a = D.array; if(a.length >= CAP) return say(FULL);
+        let i = idx(); if(i === null) i = 0;
+        i = Math.max(0, Math.min(a.length, i));
+        const v = val(), sh = a.length - i;
+        a.splice(i, 0, v);
+        say(`Вставили «<b>${esc(v)}</b>» в ячейку ${i}. Чтобы освободить её, сдвинули вправо ${sh} ${pl(sh)}. Чем левее вставка, тем больше сдвигов.`, i);
+      },
+      del(){
+        const a = D.array, i = idx();
+        if(i === null || i < 0 || i >= a.length) return say(`Укажите номер занятой ячейки от 0 до ${Math.max(0, a.length - 1)}.`);
+        const v = a.splice(i, 1)[0], sh = a.length - i;
+        say(`Убрали «<b>${esc(v)}</b>» из ячейки ${i}. Дыру нельзя оставлять, поэтому ${sh} ${pl(sh)} справа сдвинули влево.`);
+      },
+      get(){
+        const a = D.array, i = idx();
+        if(i === null || i < 0 || i >= a.length) return say(`Укажите номер занятой ячейки от 0 до ${Math.max(0, a.length - 1)}.`);
+        say(`a[${i}] = «<b>${esc(a[i])}</b>». Адрес посчитали по формуле, остальные ячейки не просматривали: O(1).`, i, 'get');
+      },
+      clr(){ D.array = []; say('Массив очищен. Блок из ' + CAP + ' ячеек остался выделенным.'); }
+    },
+    list:{
+      head(){
+        const L = D.list; if(L.length >= LIM) return say(LIMIT);
+        const v = val(), n = {v, a: addr()};
+        L.unshift(n);
+        say(`Создали узел по адресу ${n.a}. Его next указывает на прежнюю голову, а head теперь на него. Остальные узлы не двигались: O(1).`, 0);
+      },
+      tail(){
+        const L = D.list; if(L.length >= LIM) return say(LIMIT);
+        const v = val(), n = {v, a: addr()}, steps = L.length;
+        L.push(n);
+        say(steps ? `Чтобы найти последний узел, прошли ${steps} ${steps === 1 ? 'переход' : steps < 5 ? 'перехода' : 'переходов'} от head, потом присоединили новый. Если хранить указатель на хвост, обход не нужен.` : 'Список был пуст, поэтому новый узел стал головой.', L.length - 1);
+      },
+      del(){
+        const L = D.list; if(!L.length) return say('Список пуст, удалять нечего.');
+        const n = L.shift();
+        say(`head переставили на следующий узел. Память узла «<b>${esc(n.v)}</b>» освободили, остальные узлы остались на своих адресах: O(1).`);
+      },
+      get(){
+        const L = D.list, i = idx();
+        if(i === null || i < 0 || i >= L.length) return say(`Укажите номер узла от 0 до ${Math.max(0, L.length - 1)}.`);
+        say(`Дошли до узла ${i} («<b>${esc(L[i].v)}</b>»), пройдя ${i + 1} ${i + 1 === 1 ? 'узел' : i + 1 < 5 ? 'узла' : 'узлов'} от head. В массиве хватило бы одного шага.`, i, 'get');
+      },
+      clr(){ D.list = []; say('Список очищен, head указывает на NULL.'); }
+    },
+    stack:{
+      push(){
+        const s = D.stack; if(s.length >= LIM) return say(LIMIT);
+        const v = val(); s.push(v);
+        say(`«<b>${esc(v)}</b>» лёг на вершину. Добавлять можно только сюда.`, s.length - 1);
+      },
+      pop(){
+        const s = D.stack; if(!s.length) return say('Стек пуст. В программе перед pop нужна такая проверка.');
+        const v = s.pop();
+        say(`Сняли «<b>${esc(v)}</b>» с вершины: он вошёл последним, поэтому выходит первым.`);
+      },
+      clr(){ D.stack = []; say('Стек очищен.'); }
+    },
+    queue:{
+      enq(){
+        const q = D.queue; if(q.length >= LIM) return say(LIMIT);
+        const v = val(); q.push(v);
+        say(`«<b>${esc(v)}</b>» встал в хвост. Те, кто пришёл раньше, остаются впереди.`, q.length - 1);
+      },
+      deq(){
+        const q = D.queue; if(!q.length) return say('Очередь пуста, брать нечего.');
+        const v = q.shift();
+        say(`Взяли «<b>${esc(v)}</b>» из головы: он ждал дольше всех.`);
+      },
+      clr(){ D.queue = []; say('Очередь очищена.'); }
+    }
+  };
+
+  const BTN = {
+    array:[['add', 'В конец', 1], ['ins', 'Вставить по индексу'], ['del', 'Удалить по индексу'], ['get', 'Прочитать по индексу'], ['clr', 'Очистить']],
+    list:[['head', 'В начало', 1], ['tail', 'В конец'], ['del', 'Удалить первый'], ['get', 'Найти по номеру'], ['clr', 'Очистить']],
+    stack:[['push', 'Push', 1], ['pop', 'Pop'], ['clr', 'Очистить']],
+    queue:[['enq', 'Добавить в хвост', 1], ['deq', 'Взять из головы'], ['clr', 'Очистить']]
+  };
+  const NEEDIX = {array:1, list:1};
+
+  function controls(){
+    $('ctl').innerHTML = `<div class="field"><label for="v">Значение</label><input id="v" maxlength="3" autocomplete="off" placeholder="авто"></div>`
+      + (NEEDIX[tab] ? `<div class="field"><label for="ix">Номер</label><input id="ix" type="number" min="0" max="${CAP - 1}" placeholder="0"></div>` : '')
+      + BTN[tab].map(b => `<button type="button" data-act="${b[0]}"${b[2] ? ' class="p"' : ''}>${b[1]}</button>`).join('');
+    $('v').addEventListener('keydown', e => { if(e.key === 'Enter') ACT[tab][BTN[tab][0][0]](); });
+  }
+
+  function draw(){
+    const el = $('view');
+    if(tab === 'array'){
+      const a = D.array;
+      let h = `<p class="dscap">Блок из ${CAP} ячеек выделен заранее и лежит в памяти подряд. Занято: <b>${a.length}</b>, свободно: ${CAP - a.length}.</p><div class="hgrid">`;
+      for(let i = 0; i < CAP; i++){
+        const cls = 'hslot' + (i < a.length ? ' filled' : '') + (i === hot ? (kind === 'get' ? ' probe' : ' new') : '');
+        h += `<div class="${cls}"><i>${i}</i><b>${i < a.length ? esc(a[i]) : '·'}</b><i class="ad">0x${(0x100 + i * 4).toString(16)}</i></div>`;
+      }
+      el.innerHTML = h + '</div>';
+    } else if(tab === 'list'){
+      const L = D.list;
+      let h = '<p class="dscap">Узлы лежат в памяти где попало: у каждого свой адрес и ссылка на следующий.</p><div class="lrow"><span class="ptr">head</span><span class="harrow">→</span>';
+      L.forEach((n, i) => {
+        h += `<span class="lnode${i === hot ? (kind === 'get' ? ' hot' : ' new') : ''}"><b>${esc(n.v)}</b><i>${n.a}</i></span><span class="harrow">→</span>`;
+      });
+      el.innerHTML = h + '<span class="nul">NULL</span></div>';
+    } else if(tab === 'stack'){
+      const s = D.stack;
+      let h = '<p class="dscap">Видна и доступна только вершина. Всё, что ниже, ждёт своей очереди.</p><div class="stackv">';
+      if(!s.length) h += '<span class="nul">стек пуст</span>';
+      for(let i = s.length - 1; i >= 0; i--){
+        h += `<div class="sitem"><span class="lnode${i === hot ? ' new' : ''}"><b>${esc(s[i])}</b></span>${i === s.length - 1 ? '<span class="ptr">top</span>' : ''}</div>`;
+      }
+      el.innerHTML = h + '<div class="sbase"></div></div>';
+    } else {
+      const q = D.queue;
+      let h = '<p class="dscap">Берут из головы, добавляют в хвост. Порядок выхода совпадает с порядком входа.</p><div class="qrow">';
+      if(!q.length) h += '<span class="nul">очередь пуста</span>';
+      else{
+        h += '<span class="ptr">head: выход</span>';
+        q.forEach((v, i) => { h += `<span class="lnode${i === hot ? ' new' : ''}"><b>${esc(v)}</b></span>`; });
+        h += '<span class="ptr">tail: вход</span>';
+      }
+      el.innerHTML = h + '</div>';
+    }
+  }
+
+  function setTab(t){
+    tab = t; hot = -1; kind = '';
+    document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    $('info').innerHTML = `<h2>${INFO[t][0]}</h2><p class="meta" style="margin:0">${INFO[t][1]}</p>`;
+    $('msg').innerHTML = 'Нажмите кнопку, чтобы выполнить операцию. Поле «Значение» можно оставить пустым: буква подставится сама.';
+    controls(); draw();
+  }
+
+  $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if(b) setTab(b.dataset.tab); });
+  $('ctl').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if(b) ACT[tab][b.dataset.act](); });
+  D.array = ['A', 'B', 'C']; D.list = ['A', 'B', 'C'].map(v => ({v, a: addr()})); D.stack = ['A', 'B', 'C']; D.queue = ['A', 'B', 'C'];
+  ctr = 3;
+  setTab('array');
+})();
+</script>
+</body>
+</html>
