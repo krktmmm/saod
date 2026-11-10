@@ -6,7 +6,7 @@
 
 Откройте `index.html` в браузере. Сервер и сборка не нужны.
 
-Ну или перейдите по ссылке [![Открыть сайт](https://shields.io)](https://pirat3571.github.io/graphical-trees/)
+Ну или откройте сайт [![Открыть](https://img.shields.io/badge/Открыть-green?style=for-the-badge)](https://pirat3571.github.io/graphical-trees/)
 
 
 ## Разделы
