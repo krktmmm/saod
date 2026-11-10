@@ -56,7 +56,10 @@
     </aside>
   </div>
 
-  <section class="card" id="quiz"></section>
+  <details>
+    <summary>Проверь себя: мини-тест по выбранной сортировке</summary>
+    <div id="quiz"></div>
+  </details>
 
   <details>
     <summary>Как считаются C и M</summary>
@@ -756,7 +759,7 @@
     build();
   });
   function mountQuiz(){
-    S.mountQuiz($('quiz'), {title:'Проверь себя: ' + ALGOS[curAlgo].name, items:S.SORT_QUIZ[curAlgo]});
+    S.mountQuiz($('quiz'), {title:'Вопросы по ' + ALGOS[curAlgo].name, items:S.SORT_QUIZ[curAlgo]});
   }
   $('go').onclick = build;
   $('ex').onclick = () => {

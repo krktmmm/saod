@@ -603,3 +603,7 @@ input[type=checkbox]:focus-visible{outline:2px solid var(--acsoft);outline-offse
   input,select{min-height:44px}
   input[type=checkbox]{width:26px!important;height:26px!important;min-height:0}
 }
+
+/* одинаковые отступы между блоками на странице сортировок */
+.sort-layout #stage > .card:last-child{margin-bottom:0}
+.sort-layout .meter-box{margin-bottom:0}
