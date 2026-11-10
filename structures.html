@@ -41,9 +41,9 @@
           <tr><td>Память</td><td>выделена заранее, одним блоком</td><td>по одному узлу, узлы разбросаны</td><td>как у списка или массива</td><td>как у списка или кольцевого массива</td></tr>
           <tr><td>Размер</td><td>задаётся при создании</td><td>растёт и убывает</td><td>растёт и убывает</td><td>растёт и убывает</td></tr>
           <tr><td>Доступ по номеру</td><td>O(1)</td><td>O(n)</td><td>только вершина</td><td>только голова</td></tr>
-          <tr><td>Вставка в начало</td><td>O(n), сдвиг</td><td>O(1)</td><td>push: O(1)</td><td>нет</td></tr>
-          <tr><td>Вставка в конец</td><td>O(1), пока есть место</td><td>O(n), с указателем на хвост O(1)</td><td>нет</td><td>O(1)</td></tr>
-          <tr><td>Удаление первого</td><td>O(n), сдвиг</td><td>O(1)</td><td>pop: O(1)</td><td>O(1)</td></tr>
+          <tr><td>Добавление в начало</td><td>O(1): <code>arr[0] = x</code>, старое значение затирается</td><td>O(1)</td><td>push: O(1)</td><td>нет</td></tr>
+          <tr><td>Добавление в конец</td><td>O(1), пока есть место</td><td>O(n), с указателем на хвост O(1)</td><td>нет</td><td>O(1)</td></tr>
+          <tr><td>Удаление первого</td><td>O(1): ячейка освобождается, остаётся пустая</td><td>O(1)</td><td>pop: O(1)</td><td>O(1)</td></tr>
           <tr><td>Нужные указатели</td><td>адрес начала блока</td><td>head</td><td>top</td><td>head и tail</td></tr>
         </tbody>
       </table>
@@ -56,6 +56,7 @@
   </nav>
 </main>
 <script src="assets/core.js"></script>
+<script src="assets/pocket.js"></script>
 <script>
 (function(){
   'use strict';
@@ -69,11 +70,71 @@
   const LIMIT = `На схеме помещается не больше ${LIM} элементов. В настоящей структуре этого предела нет.`;
 
   const INFO = {
-    array:['Массив', 'Один непрерывный блок памяти, размер которого задают при создании. Ячейки одного типа идут подряд, поэтому адрес i-й вычисляется сразу: база + i·размер. Читать по номеру быстро, а вставка и удаление в середине сдвигают всё, что стоит правее. Когда место кончилось, нужен новый, больший блок.'],
+    array:['Массив', 'Массив — это несколько ячеек подряд в памяти. Размер задаётся один раз при создании: <code>int arr[8]</code> сразу выделяет 8 ячеек. К любой ячейке можно обратиться по номеру, например <code>arr[3]</code>, и это быстро: адрес считается по формуле «начало + номер × размер ячейки». Увеличить массив потом нельзя.'],
     list:['Односвязный список', 'Каждый узел хранит значение и адрес следующего узла. Память выделяется по одному узлу и в любой момент, поэтому узлы лежат где придётся. Вставка и удаление у известного узла меняют один-два указателя. Зато чтобы добраться до i-го узла, нужно пройти все предыдущие.'],
     stack:['Стек', 'Принцип LIFO: последним пришёл, первым вышел. Доступна только вершина. Обычно стек делают списком, у которого голова и есть вершина, так что хватает одного указателя. Операции push и pop занимают O(1).'],
     queue:['Очередь', 'Принцип FIFO: первым пришёл, первым вышел. Добавляют в хвост, берут из головы. Чтобы обе операции занимали O(1), хранят указатели на оба конца списка.']
   };
+
+  /* ---------- Код на C: подсвечивается функция, которую выполняет кнопка ---------- */
+  const NODE = [['struct node {', ''], ['    char val;', ''], ['    struct node *next;      /* адрес следующего узла */', ''], ['};', '']];
+  const L = (text, tag) => [text, tag || ''];
+  const CODES = {
+    array:{
+      title:'Массив на C',
+      desc:'Подсвечена строка, которую выполняет нажатая кнопка.',
+      foot:'Здесь 0 условно значит «пусто». <b>arr[i] = x</b> меняет только одну ячейку, остальные не двигаются.',
+      code:[
+        L('#define N 8'), L('int arr[N];        /* сразу 8 ячеек подряд */'), L(''),
+        L('arr[i] = x;        /* записать x в ячейку i */', 'set'),
+        L('x = arr[i];        /* прочитать ячейку i */', 'get'),
+        L('arr[i] = 0;        /* очистить ячейку */', 'del'), L(''),
+        L('for (i = 0; i < N; i++)', 'clr'), L('    arr[i] = 0;    /* очистить всё */', 'clr')
+      ]
+    },
+    list:{
+      title:'Односвязный список на C',
+      desc:'Каждый узел выделяется отдельно, поэтому узлы лежат в памяти где придётся. Подсвечена функция, которую выполняет нажатая кнопка.',
+      foot:'<b>head</b> — адрес первого узла. Последний узел хранит <b>next = NULL</b>. Чтобы добраться до i-го узла, нужно пройти по <b>next</b> все предыдущие.',
+      code:NODE.concat([
+        L(''), L('struct node *head = NULL;'), L(''),
+        L('void add_head(char x) {', 'head'), L('    struct node *p = malloc(sizeof(struct node));', 'head'), L('    p->val = x;', 'head'), L('    p->next = head;            /* новый узел смотрит на старую голову */', 'head'), L('    head = p;', 'head'), L('}', 'head'), L(''),
+        L('void add_tail(char x) {', 'tail'), L('    struct node *p = malloc(sizeof(struct node));', 'tail'), L('    p->val = x;', 'tail'), L('    p->next = NULL;', 'tail'), L('    if (head == NULL) head = p;', 'tail'), L('    else {', 'tail'), L('        struct node *t = head;', 'tail'), L('        while (t->next != NULL)', 'tail'), L('            t = t->next;       /* обход всего списка */', 'tail'), L('        t->next = p;', 'tail'), L('    }', 'tail'), L('}', 'tail'), L(''),
+        L('void del_head() {', 'del'), L('    if (head == NULL) return;', 'del'), L('    struct node *p = head;', 'del'), L('    head = head->next;', 'del'), L('    free(p);', 'del'), L('}', 'del'), L(''),
+        L('struct node *get(int i) {', 'get'), L('    struct node *t = head;', 'get'), L('    while (i-- > 0)', 'get'), L('        t = t->next;           /* i переходов */', 'get'), L('    return t;', 'get'), L('}', 'get'), L(''),
+        L('void clear() {', 'clr'), L('    while (head != NULL) del_head();', 'clr'), L('}', 'clr')
+      ])
+    },
+    stack:{
+      title:'Стек на C',
+      desc:'Стек как список, у которого голова — вершина. Подсвечена функция, которую выполняет нажатая кнопка.',
+      foot:'Достаточно одного указателя <b>top</b>. Добавление и удаление происходят в одном и том же месте, поэтому обе операции занимают O(1).',
+      code:NODE.concat([
+        L(''), L('struct node *top = NULL;'), L(''),
+        L('void push(char x) {', 'push'), L('    struct node *p = malloc(sizeof(struct node));', 'push'), L('    p->val = x;', 'push'), L('    p->next = top;', 'push'), L('    top = p;', 'push'), L('}', 'push'), L(''),
+        L('char pop() {', 'pop'), L('    if (top == NULL) return 0; /* стек пуст */', 'pop'), L('    struct node *p = top;', 'pop'), L('    char x = p->val;', 'pop'), L('    top = top->next;', 'pop'), L('    free(p);', 'pop'), L('    return x;', 'pop'), L('}', 'pop'), L(''),
+        L('void clear() {', 'clr'), L('    while (top != NULL) pop();', 'clr'), L('}', 'clr')
+      ])
+    },
+    queue:{
+      title:'Очередь на C',
+      desc:'Очередь как список с двумя указателями. Подсвечена функция, которую выполняет нажатая кнопка.',
+      foot:'<b>tail</b> позволяет добавлять в конец без обхода списка. Когда очередь опустела, нужно обнулить и <b>tail</b>, иначе он будет указывать на освобождённый узел.',
+      code:NODE.concat([
+        L(''), L('struct node *head = NULL;      /* отсюда берём */'), L('struct node *tail = NULL;      /* сюда добавляем */'), L(''),
+        L('void enqueue(char x) {', 'enq'), L('    struct node *p = malloc(sizeof(struct node));', 'enq'), L('    p->val = x;', 'enq'), L('    p->next = NULL;', 'enq'), L('    if (tail == NULL) head = tail = p;', 'enq'), L('    else {', 'enq'), L('        tail->next = p;', 'enq'), L('        tail = p;', 'enq'), L('    }', 'enq'), L('}', 'enq'), L(''),
+        L('char dequeue() {', 'deq'), L('    if (head == NULL) return 0;', 'deq'), L('    struct node *p = head;', 'deq'), L('    char x = p->val;', 'deq'), L('    head = head->next;', 'deq'), L('    if (head == NULL) tail = NULL;', 'deq'), L('    free(p);', 'deq'), L('    return x;', 'deq'), L('}', 'deq'), L(''),
+        L('void clear() {', 'clr'), L('    while (head != NULL) dequeue();', 'clr'), L('}', 'clr')
+      ])
+    }
+  };
+  const TAGS = {
+    array:{set:['set'], get:['get'], del:['del'], clr:['clr']},
+    list:{head:['head'], tail:['tail'], del:['del'], get:['get'], clr:['clr']},
+    stack:{push:['push'], pop:['pop'], clr:['clr']},
+    queue:{enq:['enq'], deq:['deq'], clr:['clr']}
+  };
+  const pocket = S.mountPocket({key:'dsCodeOpen', title:'', code:CODES.array.code});
 
   function val(){
     let v = $('v').value.trim().slice(0, 3);
@@ -86,31 +147,28 @@
 
   const ACT = {
     array:{
-      add(){
-        const a = D.array; if(a.length >= CAP) return say(FULL);
-        const v = val(); a.push(v);
-        say(`Записали «<b>${esc(v)}</b>» в ячейку ${a.length - 1}. Остальные элементы не трогали: одна операция.`, a.length - 1);
-      },
-      ins(){
-        const a = D.array; if(a.length >= CAP) return say(FULL);
-        let i = idx(); if(i === null) i = 0;
-        i = Math.max(0, Math.min(a.length, i));
-        const v = val(), sh = a.length - i;
-        a.splice(i, 0, v);
-        say(`Вставили «<b>${esc(v)}</b>» в ячейку ${i}. Чтобы освободить её, сдвинули вправо ${sh} ${pl(sh)}. Чем левее вставка, тем больше сдвигов.`, i);
-      },
-      del(){
-        const a = D.array, i = idx();
-        if(i === null || i < 0 || i >= a.length) return say(`Укажите номер занятой ячейки от 0 до ${Math.max(0, a.length - 1)}.`);
-        const v = a.splice(i, 1)[0], sh = a.length - i;
-        say(`Убрали «<b>${esc(v)}</b>» из ячейки ${i}. Дыру нельзя оставлять, поэтому ${sh} ${pl(sh)} справа сдвинули влево.`);
+      set(){
+        const a = D.array; let i = idx();
+        if(i === null) i = a.indexOf(null);
+        if(i < 0 || i >= CAP) return say(`Укажите номер ячейки от 0 до ${CAP - 1}. Свободных ячеек нет, поэтому выберите, какую перезаписать.`);
+        const old = a[i], v = val(); a[i] = v;
+        say(old === null
+          ? `Записали «<b>${esc(v)}</b>» в ячейку ${i}. Это одна операция, остальные ячейки не трогали.`
+          : `Записали «<b>${esc(v)}</b>» в ячейку ${i}. Старое значение «${esc(old)}» пропало. Остальные ячейки не трогали, ничего не сдвигается.`, i);
       },
       get(){
         const a = D.array, i = idx();
-        if(i === null || i < 0 || i >= a.length) return say(`Укажите номер занятой ячейки от 0 до ${Math.max(0, a.length - 1)}.`);
-        say(`a[${i}] = «<b>${esc(a[i])}</b>». Адрес посчитали по формуле, остальные ячейки не просматривали: O(1).`, i, 'get');
+        if(i === null || i < 0 || i >= CAP) return say(`Укажите номер ячейки от 0 до ${CAP - 1}.`);
+        say(a[i] === null ? `В ячейке ${i} пусто.` : `arr[${i}] = «<b>${esc(a[i])}</b>». Остальные ячейки смотреть не нужно, адрес считается по формуле.`, i, 'get');
       },
-      clr(){ D.array = []; say('Массив очищен. Блок из ' + CAP + ' ячеек остался выделенным.'); }
+      del(){
+        const a = D.array, i = idx();
+        if(i === null || i < 0 || i >= CAP) return say(`Укажите номер ячейки от 0 до ${CAP - 1}.`);
+        if(a[i] === null) return say(`Ячейка ${i} и так пустая.`);
+        const old = a[i]; a[i] = null;
+        say(`Очистили ячейку ${i} (там было «${esc(old)}»). Соседние ячейки остались на местах.`);
+      },
+      clr(){ D.array = Array(CAP).fill(null); say('Все ячейки очищены. Память под 8 ячеек всё равно остаётся выделенной.'); }
     },
     list:{
       head(){
@@ -166,28 +224,31 @@
   };
 
   const BTN = {
-    array:[['add', 'В конец', 1], ['ins', 'Вставить по индексу'], ['del', 'Удалить по индексу'], ['get', 'Прочитать по индексу'], ['clr', 'Очистить']],
+    array:[['set', 'Записать по индексу', 1], ['get', 'Прочитать по индексу'], ['del', 'Очистить ячейку'], ['clr', 'Очистить всё']],
     list:[['head', 'В начало', 1], ['tail', 'В конец'], ['del', 'Удалить первый'], ['get', 'Найти по номеру'], ['clr', 'Очистить']],
     stack:[['push', 'Push', 1], ['pop', 'Pop'], ['clr', 'Очистить']],
     queue:[['enq', 'Добавить в хвост', 1], ['deq', 'Взять из головы'], ['clr', 'Очистить']]
   };
   const NEEDIX = {array:1, list:1};
 
+  function run(a){ ACT[tab][a](); pocket.show(TAGS[tab][a] || []); }
+
   function controls(){
     $('ctl').innerHTML = `<div class="field"><label for="v">Значение</label><input id="v" maxlength="3" autocomplete="off" placeholder="авто"></div>`
       + (NEEDIX[tab] ? `<div class="field"><label for="ix">Номер</label><input id="ix" type="number" min="0" max="${CAP - 1}" placeholder="0"></div>` : '')
       + BTN[tab].map(b => `<button type="button" data-act="${b[0]}"${b[2] ? ' class="p"' : ''}>${b[1]}</button>`).join('');
-    $('v').addEventListener('keydown', e => { if(e.key === 'Enter') ACT[tab][BTN[tab][0][0]](); });
+    S.enhanceNumbers($('ctl'));
+    $('v').addEventListener('keydown', e => { if(e.key === 'Enter') run(BTN[tab][0][0]); });
   }
 
   function draw(){
     const el = $('view');
     if(tab === 'array'){
-      const a = D.array;
-      let h = `<p class="dscap">Блок из ${CAP} ячеек выделен заранее и лежит в памяти подряд. Занято: <b>${a.length}</b>, свободно: ${CAP - a.length}.</p><div class="hgrid">`;
+      const a = D.array, used = a.filter(x => x !== null).length;
+      let h = `<p class="dscap">Блок из ${CAP} ячеек выделен заранее и лежит в памяти подряд. Занято: <b>${used}</b>, свободно: ${CAP - used}.</p><div class="hgrid">`;
       for(let i = 0; i < CAP; i++){
-        const cls = 'hslot' + (i < a.length ? ' filled' : '') + (i === hot ? (kind === 'get' ? ' probe' : ' new') : '');
-        h += `<div class="${cls}"><i>${i}</i><b>${i < a.length ? esc(a[i]) : '·'}</b><i class="ad">0x${(0x100 + i * 4).toString(16)}</i></div>`;
+        const cls = 'hslot' + (a[i] !== null ? ' filled' : '') + (i === hot ? (kind === 'get' ? ' probe' : ' new') : '');
+        h += `<div class="${cls}"><i>${i}</i><b>${a[i] !== null ? esc(a[i]) : '·'}</b><i class="ad">0x${(0x100 + i * 4).toString(16)}</i></div>`;
       }
       el.innerHTML = h + '</div>';
     } else if(tab === 'list'){
@@ -221,14 +282,16 @@
   function setTab(t){
     tab = t; hot = -1; kind = '';
     document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-    $('info').innerHTML = `<h2>${INFO[t][0]}</h2><p class="meta" style="margin:0">${INFO[t][1]}</p>`;
+    $('info').innerHTML = `<h2>${INFO[t][0]}</h2><p class="meta" style="margin:0">${INFO[t][1]}</p>${INFO[t][2] || ''}`;
+    pocket.setCode(CODES[t].code, {title: CODES[t].title, desc: CODES[t].desc, foot: CODES[t].foot});
+    pocket.show([]);
     $('msg').innerHTML = 'Нажмите кнопку, чтобы выполнить операцию. Поле «Значение» можно оставить пустым: буква подставится сама.';
     controls(); draw();
   }
 
   $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if(b) setTab(b.dataset.tab); });
-  $('ctl').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if(b) ACT[tab][b.dataset.act](); });
-  D.array = ['A', 'B', 'C']; D.list = ['A', 'B', 'C'].map(v => ({v, a: addr()})); D.stack = ['A', 'B', 'C']; D.queue = ['A', 'B', 'C'];
+  $('ctl').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if(b) run(b.dataset.act); });
+  D.array = ['A', 'B', 'C', null, null, null, null, null]; D.list = ['A', 'B', 'C'].map(v => ({v, a: addr()})); D.stack = ['A', 'B', 'C']; D.queue = ['A', 'B', 'C'];
   ctr = 3;
   setTab('array');
 })();

@@ -349,6 +349,31 @@
     return api;
   };
 
+  /* ---------- Поля с числом: свои кнопки − и + вместо стрелок браузера ---------- */
+  TS.enhanceNumbers = function(root){
+    (root || document).querySelectorAll('input[type=number]').forEach(inp => {
+      if(inp.parentNode.classList.contains('num')) return;
+      const w = document.createElement('div');
+      w.className = 'num';
+      inp.parentNode.insertBefore(w, inp);
+      const mk = (t, d, label) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = t; b.tabIndex = -1;
+        b.setAttribute('aria-label', label);
+        b.onclick = () => {
+          try{ if(d > 0) inp.stepUp(); else inp.stepDown(); }catch(e){}
+          inp.dispatchEvent(new Event('input', {bubbles:true}));
+          inp.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        return b;
+      };
+      w.appendChild(mk('−', -1, 'Меньше'));
+      w.appendChild(inp);
+      w.appendChild(mk('+', 1, 'Больше'));
+    });
+  };
+  TS.enhanceNumbers();
+
   /* ---------- Тема ---------- */
   TS.initTheme = function(){
     const root = document.documentElement;
