@@ -30,6 +30,15 @@
       <button class="p" id="go" type="button">Построить и удалить</button>
       <button id="ex" type="button">Пример</button>
     </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field" style="flex:1 1 100%">
+        <label>Если у удаляемого узла два потомка, заменять на</label>
+        <div class="row tabs wrap" id="modeTabs" style="margin:0">
+          <button type="button" class="tab on" data-mode="pred">Максимум из левого поддерева</button>
+          <button type="button" class="tab" data-mode="succ">Минимум из правого поддерева</button>
+        </div>
+      </div>
+    </div>
     <div class="meta" style="margin-top:9px">Пробелы и запятые между буквами можно ставить для удобства. Если ключа нет, дерево не меняется.</div>
   </section>
 
@@ -40,7 +49,7 @@
     <div class="cases">
       <div class="case"><svg class="case-art" viewBox="20 6 108 98" role="img" aria-hidden="true"><defs><marker id="cam1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--tx)"/></marker><marker id="caa1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ac)"/></marker></defs><circle cx="40" cy="26" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="50" y1="34" x2="98" y2="62" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam1)"/><path d="M-2.5-7h5v4.5h4.5v5h-4.5v4.5h-5v-4.5h-4.5v-5h4.5z" transform="translate(74 48) rotate(45)" fill="var(--ac)"/><circle cx="108" cy="70" r="13" fill="var(--tx)"/><line x1="94" y1="84" x2="124" y2="56" stroke="var(--ac)" stroke-width="2.4" stroke-linecap="round"/></svg><b>1. Лист</b>У удаляемого узла нет потомков — просто отрезаем его от родителя.</div>
       <div class="case"><svg class="case-art" viewBox="16 3 226 114" role="img" aria-hidden="true"><defs><marker id="cam2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--tx)"/></marker><marker id="caa2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ac)"/></marker></defs><circle cx="36" cy="20" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="45" y1="28" x2="70" y2="48" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam2)"/><path d="M-2.5-7h5v4.5h4.5v5h-4.5v4.5h-5v-4.5h-4.5v-5h4.5z" transform="translate(58 38) rotate(45)" fill="var(--ac)"/><circle cx="80" cy="56" r="13" fill="var(--tx)"/><line x1="70" y1="64" x2="46" y2="92" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam2)"/><path d="M-2.5-7h5v4.5h4.5v5h-4.5v4.5h-5v-4.5h-4.5v-5h4.5z" transform="translate(58 78) rotate(45)" fill="var(--ac)"/><circle cx="36" cy="100" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="36" y1="34" x2="36" y2="85" stroke="var(--ac)" stroke-width="1.3" marker-end="url(#caa2)"/><g transform="translate(-56 0)"><circle cx="186" cy="20" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="195" y1="28" x2="220" y2="48" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam2)"/><path d="M-2.5-7h5v4.5h4.5v5h-4.5v4.5h-5v-4.5h-4.5v-5h4.5z" transform="translate(208 38) rotate(45)" fill="var(--ac)"/><circle cx="230" cy="56" r="13" fill="var(--tx)"/><line x1="240" y1="64" x2="266" y2="90" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam2)"/><path d="M-2.5-7h5v4.5h4.5v5h-4.5v4.5h-5v-4.5h-4.5v-5h4.5z" transform="translate(253 78) rotate(45)" fill="var(--ac)"/><circle cx="276" cy="100" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><path d="M199 20H276V84" fill="none" stroke="var(--ac)" stroke-width="1.3" marker-end="url(#caa2)"/></g></svg><b>2. Один потомок</b>Подставляем единственного потомка на место удалённого узла.</div>
-      <div class="case"><svg class="case-art" viewBox="26 0 148 116" role="img" aria-hidden="true"><defs><marker id="cam3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--tx)"/></marker><marker id="caa3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ac)"/></marker></defs><circle cx="70" cy="16" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="80" y1="24" x2="92" y2="40" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><circle cx="100" cy="50" r="13" fill="var(--tx)"/><line x1="92" y1="60" x2="66" y2="82" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><line x1="108" y1="60" x2="134" y2="82" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><polygon points="60,84 46,112 74,112" fill="none" stroke="var(--tx)" stroke-width="1.8" stroke-linejoin="round"/><polygon points="140,84 126,112 154,112" fill="none" stroke="var(--tx)" stroke-width="1.8" stroke-linejoin="round"/></svg><b>3. Два потомка</b>Находим максимум в левом поддереве (предшественника), переносим его ключ в удаляемый узел и удаляем предшественника — у него уже нет правого потомка.</div>
+      <div class="case"><svg class="case-art" viewBox="26 0 148 116" role="img" aria-hidden="true"><defs><marker id="cam3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--tx)"/></marker><marker id="caa3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ac)"/></marker></defs><circle cx="70" cy="16" r="13" fill="var(--card)" stroke="var(--tx)" stroke-width="1.8"/><line x1="80" y1="24" x2="92" y2="40" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><circle cx="100" cy="50" r="13" fill="var(--tx)"/><line x1="92" y1="60" x2="66" y2="82" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><line x1="108" y1="60" x2="134" y2="82" stroke="var(--tx)" stroke-width="1.8" marker-end="url(#cam3)"/><polygon points="60,84 46,112 74,112" fill="none" stroke="var(--tx)" stroke-width="1.8" stroke-linejoin="round"/><polygon points="140,84 126,112 154,112" fill="none" stroke="var(--tx)" stroke-width="1.8" stroke-linejoin="round"/></svg><b>3. Два потомка</b>Находим максимум в левом поддереве (предшественника), переносим его ключ в удаляемый узел и удаляем предшественника — у него уже нет правого потомка. Можно взять и минимум правого поддерева (преемника): тогда у него нет левого потомка.</div>
     </div>
   </div>
 
@@ -56,10 +65,29 @@
   'use strict';
   const S = window.TreeSite;
   const $ = S.$;
+  let mode = 'pred';
   let root = null, seq = 0, steps = [];
   const mk = d => ({id:++seq, d, l:null, r:null});
   const CODE = [["struct vertex{", ""], ["    int data;", ""], ["    struct vertex *left;", ""], ["    struct vertex *right;", ""], ["};", ""], ["", ""], ["void delete_vertex(int data, struct vertex **root) {", "sig"], ["    struct vertex **p = root;", "search"], ["    while (*p != NULL) {", "search"], ["        if (data < (*p)->data) p = &((*p)->left);", "search"], ["        else if (data > (*p)->data) p = &((*p)->right);", "search"], ["        else break;", "search"], ["    }", ""], ["", ""], ["    if (*p != NULL) {", "found nf"], ["        struct vertex *q = *p;", "found"], ["        if (q->left == NULL) *p = q->right;", "c1"], ["        else if (q->right == NULL) *p = q->left;", "c2"], ["", ""], ["        else {", "c3"], ["            struct vertex *r = q->left;", "c3 pred"], ["            struct vertex *s = q;", "c3 pred"], ["", "c3"], ["            if (r->right == NULL) {", "c3 pred"], ["                r->right = q->right;", "c3 link"], ["                *p = r;", "c3 link"], ["            }", "c3"], ["            else {", "c3"], ["                while (r->right != NULL) {", "c3 pred"], ["                    s = r; r = r->right;", "c3 pred"], ["                }", "c3"], ["                s->right = r->left;", "c3 link"], ["                r->left = q->left;", "c3 link"], ["                r->right = q->right;", "c3 link"], ["                *p = r;", "c3 link"], ["            }", "c3"], ["        }", "c3"], ["        free(q);", "free"], ["    }", ""], ["}", ""]];
   const pocket = S.mountPocket({key:"sdpDelCodeOpen", title:"Удаление из СДП на C", desc:"Функция <code>delete_vertex</code>: указатель <code>p</code> на ссылку на удаляемый узел. Подсвечены строки текущего шага.", foot:"<b>p</b> — ссылка на удаляемый узел в родителе (на схеме отмечен родитель), <b>q</b> — удаляемый узел, <b>r</b> — его предшественник (максимум слева), <b>s</b> — родитель <b>r</b>. В коде предшественник перевешивается на место <b>q</b>, на схеме для наглядности копируется его ключ — дерево получается одно и то же.", code:CODE});
+  const CODE_SUCC = CODE.map(l => l.slice());
+  function sw(from, to){ for(const l of CODE_SUCC){ if(l[0] === from){ l[0] = to; return; } } }
+  sw("            struct vertex *r = q->left;", "            struct vertex *r = q->right;");
+  sw("            if (r->right == NULL) {", "            if (r->left == NULL) {");
+  sw("                r->right = q->right;", "                r->left = q->left;");
+  sw("                while (r->right != NULL) {", "                while (r->left != NULL) {");
+  sw("                    s = r; r = r->right;", "                    s = r; r = r->left;");
+  sw("                s->right = r->left;", "                s->left = r->right;");
+  const FOOT_P = document.querySelector('.pocket-foot').innerHTML;
+  const FOOT_S = FOOT_P.replace('предшественник (максимум слева)', 'преемник (минимум справа)');
+  $('modeTabs').addEventListener('click', e => {
+    const b = e.target.closest('[data-mode]');
+    if(!b) return;
+    mode = b.dataset.mode;
+    [...$('modeTabs').querySelectorAll('.tab')].forEach(x => x.classList.toggle('on', x === b));
+    pocket.setCode(mode === 'succ' ? CODE_SUCC : CODE, {foot: mode === 'succ' ? FOOT_S : FOOT_P});
+    build();
+  });
 
 
   const player = S.mountPlayer($('stage'), {
@@ -128,27 +156,34 @@
       {bad:[t.id], tags:par ? {[t.id]:'q', [par]:'p'} : {[t.id]:'q'}, path:pathIds});
 
     if(t.l && t.r){
-      let y = t.l, yPath = [];
-      while(y.r){ yPath.push(y); y = y.r; }
+      const succ = mode === 'succ';
+      const who = succ ? 'преемник' : 'предшественник';
+      let y = succ ? t.r : t.l, yPath = [];
+      while(succ ? y.l : y.r){ yPath.push(y); y = succ ? y.l : y.r; }
       const yId = y.id;
       const sId = yPath.length ? yPath[yPath.length - 1].id : null;
       const tg = {[t.id]:sId ? 'q' : 'q, s', [yId]:'r'};
       if(sId) tg[sId] = 's';
       if(par) tg[par] = 'p';
       snap(`Случай 3: у узла «${key}» два потомка`,
-        `Заменяем узел на максимум левого поддерева — предшественника «<b>${S.esc(y.d)}</b>».<span class="l">Он больше всех ключей слева и меньше всех справа, поэтому порядок поиска сохранится. Спуск к предшественнику: ${yPath.length ? 'вправо до упора' : 'это левый потомок'}.</span>`,
+        `Заменяем узел на ${succ ? 'минимум правого поддерева — преемника' : 'максимум левого поддерева — предшественника'} «<b>${S.esc(y.d)}</b>».<span class="l">${succ ? 'Он меньше всех ключей справа и больше всех слева' : 'Он больше всех ключей слева и меньше всех справа'}, поэтому порядок поиска сохранится. Спуск к ${succ ? 'преемнику' : 'предшественнику'}: ${yPath.length ? (succ ? 'влево до упора' : 'вправо до упора') : (succ ? 'это правый потомок' : 'это левый потомок')}.</span>`,
         {bad:[t.id], tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
       const oldKey = t.d;
       t.d = y.d;
       snap(`Копируем «${y.d}» на место «${oldKey}»`,
-        `Значение «<b>${S.esc(y.d)}</b>» перенесено в узел, где был «${S.esc(oldKey)}».<span class="l">Теперь ключ «${S.esc(y.d)}» временно встречается дважды: старый узел-предшественник нужно удалить.</span>`,
+        `Значение «<b>${S.esc(y.d)}</b>» перенесено в узел, где был «${S.esc(oldKey)}».<span class="l">Теперь ключ «${S.esc(y.d)}» временно встречается дважды: старый узел-${who} нужно удалить.</span>`,
         {newId:t.id, tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
-      if(yPath.length) yPath[yPath.length - 1].r = y.l;
-      else t.l = y.l;
+      if(succ){
+        if(yPath.length) yPath[yPath.length - 1].l = y.r;
+        else t.r = y.r;
+      } else {
+        if(yPath.length) yPath[yPath.length - 1].r = y.l;
+        else t.l = y.l;
+      }
       snap(`Удаляем прежний узел «${y.d}»`,
-        `У предшественника не было правого потомка, поэтому его левое поддерево подставляем на место «${S.esc(y.d)}».<span class="l">Случай 3 сведён к случаю 1 или 2. Дерево снова содержит каждый ключ один раз.</span>`,
+        `${succ ? 'У преемника не было левого потомка, поэтому его правое поддерево подставляем' : 'У предшественника не было правого потомка, поэтому его левое поддерево подставляем'} на место «${S.esc(y.d)}».<span class="l">Случай 3 сведён к случаю 1 или 2. Дерево снова содержит каждый ключ один раз.</span>`,
         {path:pathIds.concat(yPath.map(n => n.id))});
     } else if(!t.l && !t.r){
       if(!path.length) root = null;

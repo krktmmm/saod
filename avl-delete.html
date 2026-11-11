@@ -30,6 +30,15 @@
       <button class="p" id="go" type="button">Построить и удалить</button>
       <button id="ex" type="button">Пример</button>
     </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field" style="flex:1 1 100%">
+        <label>Если у удаляемого узла два потомка, заменять на</label>
+        <div class="row tabs wrap" id="modeTabs" style="margin:0">
+          <button type="button" class="tab on" data-mode="pred">Максимум из левого поддерева</button>
+          <button type="button" class="tab" data-mode="succ">Минимум из правого поддерева</button>
+        </div>
+      </div>
+    </div>
     <div class="meta" style="margin-top:9px">Дерево строится теми же вставками с поворотами, что и на странице «АВЛ-дерево». Затем ключи удаляются по одному.</div>
   </section>
 
@@ -57,10 +66,29 @@
   'use strict';
   const S = window.TreeSite;
   const $ = S.$;
+  let mode = 'pred';
   let root = null, seq = 0, steps = [], totalRot = 0;
   const mk = d => ({id:++seq, d, b:0, l:null, r:null});
   const CODE = [["struct vertex{", ""], ["    int data;", ""], ["    int bal;", ""], ["    struct vertex *left;", ""], ["    struct vertex *right;", ""], ["};", ""], ["", ""], ["int decrease = 0;", ""], ["struct vertex *q;", ""], ["", ""], ["/* LL, LR, RR, RL — повороты из add_avl */", ""], ["", ""], ["void BL(struct vertex **p){", ""], ["    if ((*p)->bal == -1) (*p)->bal = 0;", ""], ["    else if ((*p)->bal == 0) {(*p)->bal = 1; decrease = 0;}", ""], ["    else if ((*p)->bal == 1) {", "BLrot"], ["        if ((*p)->right->bal >= 0) {", "BLrot"], ["            struct vertex *q = (*p)->right;", "BLrot"], ["            if(q->bal == 0) {q->bal = -1; (*p)->bal = 1; decrease = 0;}", "BLrot"], ["            else {q->bal = 0; (*p)->bal = 0;}", "BLrot"], ["", "BLrot"], ["            (*p)->right = q->left;", "BLrot"], ["            q->left = *p;", "BLrot"], ["            *p = q;", "BLrot"], ["        }", "BLrot"], ["        else *p = RL(*p);", "BLrot"], ["    }", ""], ["}", ""], ["", ""], ["void BR(struct vertex **p){", ""], ["    if ((*p)->bal == 1) (*p)->bal = 0;", ""], ["    else if ((*p)->bal == 0) {(*p)->bal = -1; decrease = 0;}", ""], ["    else if ((*p)->bal == -1) {", "BRrot"], ["        if ((*p)->left->bal <= 0) {", "BRrot"], ["            struct vertex *q = (*p)->left;", "BRrot"], ["            if(q->bal == 0) {q->bal = 1; (*p)->bal = -1; decrease = 0;}", "BRrot"], ["            else {q->bal = 0; (*p)->bal = 0;}", "BRrot"], ["", "BRrot"], ["            (*p)->left = q->right;", "BRrot"], ["            q->right = *p;", "BRrot"], ["            *p = q;", "BRrot"], ["        }", "BRrot"], ["        else *p = LR(*p);", "BRrot"], ["    }", ""], ["}", ""], ["", ""], ["void del(struct vertex **r) {", ""], ["    if ((*r)->right != NULL){", "pred"], ["        del(&(*r)->right);", "pred"], ["        if (decrease == 1) BR(r);", ""], ["    }", ""], ["    else {", ""], ["        q->data = (*r)->data;", "copy"], ["        q = (*r);", ""], ["        *r = (*r)->left;", "link"], ["        decrease = 1;", ""], ["    }", ""], ["}", ""], ["", ""], ["void deleteavl(int x, struct vertex **p){", ""], ["    if (*p == NULL);", "nf"], ["    else if (x < (*p)->data) {", "search"], ["        deleteavl(x, &(*p)->left);", "search"], ["        if (decrease == 1) BL(p);", ""], ["    }", ""], ["    else if (x > (*p)->data) {", "search"], ["        deleteavl(x, &(*p)->right);", "search"], ["        if (decrease == 1) BR(p);", ""], ["    }", ""], ["", ""], ["    else {", ""], ["        q = *p;", "found"], ["        if (q->left == NULL) {*p = q->right; decrease = 1;}", "c12"], ["        else if (q->right == NULL) {*p = q->left; decrease = 1;}", "c12"], ["        else {", ""], ["            del(&q->left);", "c3"], ["            if (decrease == 1) BL(p);", "c3"], ["        }", ""], ["        free(q);", "free"], ["    }", ""], ["}", ""]];
   const pocket = S.mountPocket({key:"avlDelCodeOpen", title:"Удаление из АВЛ-дерева на C", desc:"Функции <code>deleteavl</code>, <code>del</code>, <code>BL</code> и <code>BR</code>. Подсвечены строки текущего шага.", foot:"<b>decrease</b> = 1, пока высота поддерева уменьшилась и выше нужно проверить балансы. <b>BL</b> вызывается после удаления слева, <b>BR</b> — справа.", code:CODE});
+  const CODE_SUCC = CODE.map(l => l.slice());
+  function sw(from, to){ for(const l of CODE_SUCC){ if(l[0] === from){ l[0] = to; return; } } }
+  sw("    if ((*r)->right != NULL){", "    if ((*r)->left != NULL){");
+  sw("        del(&(*r)->right);", "        del(&(*r)->left);");
+  sw("        if (decrease == 1) BR(r);", "        if (decrease == 1) BL(r);");
+  sw("        *r = (*r)->left;", "        *r = (*r)->right;");
+  sw("            del(&q->left);", "            del(&q->right);");
+  sw("            if (decrease == 1) BL(p);", "            if (decrease == 1) BR(p);");
+  const FOOT_P = document.querySelector('.pocket-foot').innerHTML;
+  const FOOT_S = FOOT_P.replace('предшественник (максимум слева)', 'преемник (минимум справа)');
+  $('modeTabs').addEventListener('click', e => {
+    const b = e.target.closest('[data-mode]');
+    if(!b) return;
+    mode = b.dataset.mode;
+    [...$('modeTabs').querySelectorAll('.tab')].forEach(x => x.classList.toggle('on', x === b));
+    pocket.setCode(mode === 'succ' ? CODE_SUCC : CODE, {foot: mode === 'succ' ? FOOT_S : FOOT_P});
+    build();
+  });
 
 
   const player = S.mountPlayer($('stage'), {
@@ -175,28 +203,35 @@
 
     let ancestors;
     if(t.l && t.r){
-      let y = t.l, yPath = [];
-      while(y.r){ yPath.push(y); y = y.r; }
+      const succ = mode === 'succ';
+      const who = succ ? 'преемник' : 'предшественник';
+      let y = succ ? t.r : t.l, yPath = [];
+      while(succ ? y.l : y.r){ yPath.push(y); y = succ ? y.l : y.r; }
       const yId = y.id, yKey = y.d;
       const sId = yPath.length ? yPath[yPath.length - 1].id : null;
       const tg = {[t.id]:sId ? 'q' : 'q, s', [yId]:'r'};
       if(sId) tg[sId] = 's';
       if(par) tg[par] = 'p';
       snap(`Случай 3: у «${key}» два потомка`,
-        `Берём предшественника — максимум левого поддерева, ключ «<b>${S.esc(yKey)}</b>».<span class="l">${yPath.length ? 'Идём влево, затем вправо до упора.' : 'Максимум — это левый потомок удаляемого узла.'} После переноса его ключа удалим сам предшественник.</span>`,
+        `Берём ${succ ? 'преемника — минимум правого' : 'предшественника — максимум левого'} поддерева, ключ «<b>${S.esc(yKey)}</b>».<span class="l">${succ ? (yPath.length ? 'Идём вправо, затем влево до упора.' : 'Минимум — это правый потомок удаляемого узла.') : (yPath.length ? 'Идём влево, затем вправо до упора.' : 'Максимум — это левый потомок удаляемого узла.')} После переноса его ключа удалим сам ${who}.</span>`,
         {bad:[t.id], tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
       const oldKey = t.d;
       t.d = yKey;
       snap(`Копируем «${yKey}» на место «${oldKey}»`,
-        `Ключ «<b>${S.esc(yKey)}</b>» перенесён в удаляемый узел.<span class="l">Старый узел-предшественник пока остался в дереве — сейчас удалим его как лист или узел с одним потомком.</span>`,
+        `Ключ «<b>${S.esc(yKey)}</b>» перенесён в удаляемый узел.<span class="l">Старый узел-${who} пока остался в дереве — сейчас удалим его как лист или узел с одним потомком.</span>`,
         {newId:t.id, tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
-      if(yPath.length) yPath[yPath.length - 1].r = y.l;
-      else t.l = y.l;
-      ancestors = path.concat([{n:t, dir:-1}], yPath.map(n => ({n, dir:1})));
+      if(succ){
+        if(yPath.length) yPath[yPath.length - 1].l = y.r;
+        else t.r = y.r;
+      } else {
+        if(yPath.length) yPath[yPath.length - 1].r = y.l;
+        else t.l = y.l;
+      }
+      ancestors = path.concat([{n:t, dir:succ ? 1 : -1}], yPath.map(n => ({n, dir:succ ? -1 : 1})));
       snap(`Удалён прежний узел «${yKey}»`,
-        `У предшественника не было правого потомка; его левое поддерево подставлено на освободившееся место.<span class="l">Теперь поднимаемся от места удаления к корню и проверяем балансы.</span>`,
+        `${succ ? 'У преемника не было левого потомка; его правое поддерево подставлено' : 'У предшественника не было правого потомка; его левое поддерево подставлено'} на освободившееся место.<span class="l">Теперь поднимаемся от места удаления к корню и проверяем балансы.</span>`,
         {path:ancestors.map(a => a.n.id)});
     } else {
       const child = t.l || t.r;
