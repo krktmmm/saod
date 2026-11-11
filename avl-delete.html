@@ -64,7 +64,7 @@
 
 
   const player = S.mountPlayer($('stage'), {
-    legend: '<span><i class="dot" style="background:var(--bad)"></i>удаляемый узел / нарушение</span><span><i class="dot" style="background:var(--ok)"></i>перенесённое значение</span><span><i class="dot" style="background:var(--ac)"></i>участники поворота (P, Q, R)</span>',
+    legend: '<span><i class="dot" style="background:var(--bad)"></i>удаляемый узел / нарушение</span><span><i class="dot" style="background:var(--ok)"></i>перенесённое значение</span><span><i class="dot" style="background:var(--ac)"></i>участники поворота (P, Q, R)</span><span>p — родитель, q — удаляемый узел, r — предшественник</span>',
     render(canvas, step){
       canvas.innerHTML = '<div class="tree-host"></div>';
       S.renderBinary(canvas.querySelector('.tree-host'), step, {showBal:true});
@@ -161,6 +161,7 @@
       t = dir < 0 ? t.l : t.r;
     }
     const pathIds = path.map(p => p.n.id);
+    const par = path.length ? path[path.length - 1].n.id : null;
     if(!t){
       snap(`Удаление «${key}»: ключ не найден`,
         `Поиск: ${cmp.join('; ') || 'дерево пусто'}.<span class="l">Ключа «${S.esc(key)}» нет — дерево не меняется.</span>`,
@@ -170,22 +171,26 @@
 
     snap(`Удаление «${key}»: узел найден`,
       `Поиск: ${cmp.join('; ')}.<span class="l">Сначала удаляем узел как в обычном дереве поиска, затем восстанавливаем балансы.</span>`,
-      {bad:[t.id], path:pathIds});
+      {bad:[t.id], tags:par ? {[t.id]:'q', [par]:'p'} : {[t.id]:'q'}, path:pathIds});
 
     let ancestors;
     if(t.l && t.r){
       let y = t.l, yPath = [];
       while(y.r){ yPath.push(y); y = y.r; }
       const yId = y.id, yKey = y.d;
+      const sId = yPath.length ? yPath[yPath.length - 1].id : null;
+      const tg = {[t.id]:sId ? 'q' : 'q, s', [yId]:'r'};
+      if(sId) tg[sId] = 's';
+      if(par) tg[par] = 'p';
       snap(`Случай 3: у «${key}» два потомка`,
         `Берём предшественника — максимум левого поддерева, ключ «<b>${S.esc(yKey)}</b>».<span class="l">${yPath.length ? 'Идём влево, затем вправо до упора.' : 'Максимум — это левый потомок удаляемого узла.'} После переноса его ключа удалим сам предшественник.</span>`,
-        {bad:[t.id], tags:{[yId]:'замена'}, path:pathIds.concat(yPath.map(n => n.id))});
+        {bad:[t.id], tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
       const oldKey = t.d;
       t.d = yKey;
       snap(`Копируем «${yKey}» на место «${oldKey}»`,
         `Ключ «<b>${S.esc(yKey)}</b>» перенесён в удаляемый узел.<span class="l">Старый узел-предшественник пока остался в дереве — сейчас удалим его как лист или узел с одним потомком.</span>`,
-        {newId:t.id, tags:{[yId]:'удалить'}, path:pathIds.concat(yPath.map(n => n.id))});
+        {newId:t.id, tags:tg, path:pathIds.concat(yPath.map(n => n.id))});
 
       if(yPath.length) yPath[yPath.length - 1].r = y.l;
       else t.l = y.l;
