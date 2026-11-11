@@ -92,11 +92,14 @@
     const gap = opts.gap || 52, lvl = opts.level || 76, R = 19;
     const L = TS.layoutBinary(t, gap, lvl);
     const innerW = (L.count - 1) * gap;
-    const W = Math.max(innerW + 70, 300);
-    const H = L.depth * lvl + 78;
+    /* подпись стоит над узлом по центру: у крайних узлов даём запас по бокам, чтобы длинные слова не обрезались */
+    const tagLen = Math.max.apply(null, [0].concat(Object.values(snap.tags || {}).map(t => String(t).length)));
+    const padX = Math.max(35, Math.ceil(8 + tagLen * 4.2));
+    const W = Math.max(innerW + padX * 2, 300);
+    const H = L.depth * lvl + 92;
     const ox = (W - innerW) / 2;
     const X = id => ox + L.pos[id].x * gap;
-    const Y = id => 28 + L.pos[id].d * lvl;
+    const Y = id => 42 + L.pos[id].d * lvl;
 
     const bad = new Set(Array.isArray(snap.bad) ? snap.bad : (snap.bad !== undefined && snap.bad !== null ? [snap.bad] : []));
     const tags = snap.tags || {};
@@ -132,7 +135,7 @@
         if(Math.abs(b) > 1) subCol = 'var(--bad)';
       }
       if(sub !== null) nodes += `<text x="${cx}" y="${cy + 35}" text-anchor="middle" font-size="12" fill="${subCol}">${TS.esc(sub)}</text>`;
-      if(tags[n.id]) nodes += `<text x="${cx - 25}" y="${cy - 13}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ac)">${TS.esc(tags[n.id])}</text>`;
+      if(tags[n.id]) nodes += `<text x="${cx}" y="${cy - R - 7}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ac)" stroke="var(--card)" stroke-width="4" stroke-linejoin="round" paint-order="stroke">${TS.esc(tags[n.id])}</text>`;
     })(t);
 
     el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">${edges}${nodes}</svg>`;

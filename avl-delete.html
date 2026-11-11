@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Удаление из АВЛ-дерева по шагам</title>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=4">
     <link rel="icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -28,6 +28,7 @@
         <input id="del" value="K F" autocomplete="off" spellcheck="false" placeholder="Например: K F">
       </div>
       <button class="p" id="go" type="button">Построить и удалить</button>
+      <button id="ex" type="button">Пример</button>
     </div>
     <div class="meta" style="margin-top:9px">Дерево строится теми же вставками с поворотами, что и на странице «АВЛ-дерево». Затем ключи удаляются по одному.</div>
   </section>
@@ -49,8 +50,8 @@
     <a href="btree.html">Двоичное Б-дерево поиска →</a>
   </nav>
 </main>
-<script src="assets/core.js"></script>
-<script src="assets/pocket.js"></script>
+<script src="assets/core.js?v=4"></script>
+<script src="assets/pocket.js?v=4"></script>
 <script>
 (function(){
   'use strict';
@@ -286,7 +287,13 @@
   $('go').onclick = build;
   $('inp').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
   $('del').addEventListener('keydown', e => { if(e.key === 'Enter') build(); });
-  { const k = S.randLetters([7, 10]); $('inp').value = k; $('del').value = S.randLetters(2, {pool:k, sep:' '}); }
+  function randomExample(){
+    const k = S.randLetters([8, 11]);
+    $('inp').value = k;
+    $('del').value = S.randLetters(5 + Math.floor(Math.random() * 2), {pool:k, sep:' '});
+  }
+  $('ex').onclick = () => { randomExample(); build(); };
+  randomExample();
   build();
 })();
 </script>
