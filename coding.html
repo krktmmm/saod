@@ -1099,7 +1099,9 @@
       return {ch, n, ph, p, i, occ, log:-Math.log2(p)};
     });
     const sorted = entries.slice().sort((a, b) => b.ph - a.ph || a.i - b.i);
-    const alpha = entries.slice().sort((a, b) => a.ch < b.ch ? -1 : a.ch > b.ch ? 1 : 0);
+    const RU = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+    const akey = c => { const k = RU.indexOf(c); return k >= 0 ? k : 100 + c.codePointAt(0); };
+    const alpha = entries.slice().sort((a, b) => akey(a.ch) - akey(b.ch));
     DATA = {chars, N, entries, sorted, alpha, skipped, missing};
     MSG = null;
     ALL = {
