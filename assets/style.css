@@ -686,7 +686,7 @@ button.dd-btn:hover:not(:disabled){color:var(--tx)}
 .mtip .tf{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px;line-height:1.7;word-break:break-word}
 .mtip .tf b{color:var(--ac)}
 .mtip small{display:block;margin-top:7px;font-size:12px;color:var(--mut);line-height:1.45}
-@media (prefers-reduced-motion:reduce){.mtip,.meter[tabindex]{transition:none}}
+@scm-history-item:c%3A%5CUsers%5Cuser%5CDesktop%5C1eferferferfe%5Copen?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%22b3419585b209dbbadc7feefdbcebf1e9ac1b2b39%22%2C%22historyItemParentId%22%3A%22d20fcb771bc292f666b355552c7a3d6550ef3cb6%22%2C%22historyItemDisplayId%22%3A%22b341958%22%7Dmedia (prefers-reduced-motion:reduce){.mtip,.meter[tabindex]{transition:none}}
 
 
 /* ---------- Полосы прокрутки ---------- */
